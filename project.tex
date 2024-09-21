@@ -1,0 +1,106 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+
+% Macros for optimization
+\newcommand{\OPT}{\text{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+
+% Title and author information
+\title{Course Projecct}
+\author{Samuel B. Hopkins}
+\date{\today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+The course project is an opportunity for you to dive deeper into the SoS research literature, make connections to your own research, and more! There is a great deal of flexibility in choosing your project. However, I need to approve all the project topics before you embark on them! I expect you to schedule a discussion of your project with me before the end of October. You may (but are not required to!) work with a partner on your project.
+
+\paragraph{Possible approaches to the project}
+You could:
+\begin{itemize}
+\item Formulate a research question related to the course (and possibly also related to your main area of research) and investigate it.
+\item Read one or more papers from the SoS literature and write an exposition of them at a level understandable by the students of 6.S977. Optionally, extend one or more of the result in these papers.
+\item Implement one or more algorithms from the SoS literature and study their performance empirically.
+\item Combinations of any of the above.
+\end{itemize}
+
+None of these options are preferred above others -- in particular, original research is not a requirement for a successful project. (That said, it does of course carry many potential rewards --  it is not uncommon for MIT course projects to end up as published papers!)
+
+\paragraph{Deliverables}
+You should produce a written report on your project activities. For expository projects, this report is your exposition. For research projects, this document should discuss the research problem you decided to investigate, why it merits your attention, how it relates to the subject of the course, and your findings.
+
+Reports may vary in length, but when grading, I promise to read the first 10 pages of your report (typeset in a reasonable font with reasonable margins). I will read further material at my discretion.
+
+
+\end{document}

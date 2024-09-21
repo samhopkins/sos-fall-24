@@ -1,0 +1,122 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+
+% Macros for optimization
+\newcommand{\OPT}{\text{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+
+% Title and author information
+\title{Problem Set 1}
+\author{Samuel B. Hopkins}
+\date{\today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+Due: 9/24, 11:59pm.
+
+Please typeset your solutions in LaTeX.
+
+\begin{problem}[SoS proofs beyond eigenvalues]
+We saw in lecture that if $M \in \mathbb{R}^{n \times n}$ is a symmetric matrix with maximum eigenvalue $\lambda_{max}$, then there is always a degree-2 SoS proof that $x^\top M x \leq \lambda_{max} \cdot \|x\|^2$ -- that is, the polynomial $\lambda_{max} \cdot \|x\|^2 - x^\top M x$ is a sum of squares.
+
+\begin{enumerate}
+\item Show that this bound is tight, in the sense that if $c$ is such that $c \|x\|^2 - x^\top M x$ is a sum of squares, then $c \geq \lambda_{max}$.
+
+\item Construct a symmetric matrix $M$ such that there exists $c < \lambda_{max}(M)$ and linear functions $f_1,\ldots,f_m$ such that $c \cdot \|x\|^2 - x^\top M x = \sum_{i \leq m} f_i(x)^2$ for every $x \in \{ \pm 1\}^n$. This shows that the flexibility in a quadratic proof to use a sum of squares polynomial which is equal to $c \|x\|^2 - x^\top M x$ only for certain $x$s (namely, $x \in \{\pm 1\}^n$) makes the definition more powerful.
+\end{enumerate}
+\end{problem}
+
+
+\begin{problem}[Max cut in almost-bipartite graphs]
+Show that there is a polynomial-time algorithm with the following guarantee: given a graph $G = (V,E)$ such that there is a cut which cuts $(1-\epsilon)|E|$ edges, the algorithm outputs a cut which cuts $(1-\tilde{O}(\sqrt{\epsilon}))|E|$ edges. $(\tilde{O}$ can hide factors of $\log(1/\epsilon)$, though this is not strictly necessary.)
+
+You may use the following basic anticoncentration fact for Gaussians: if $Z \sim N(0,1)$, then $Pr(|Z| \leq \delta) = O(\delta)$.
+\end{problem}
+
+\begin{problem}[Cauchy-Schwarz for Pseudoexpectations]
+An important fact about any probability distribution $\mu$ is that for any real-valued $f$ and $g$, $\mathbb{E}_{x \sim \mu} f(x) g(x) \leq \sqrt{\mathbb{E} f(x)^2} \cdot \sqrt{ \mathbb{E} g(x)^2 }$. Show that if $\tilde{\mathbb{E}}$ is a (degree 2) pseudoexpectation and $f,g$ are linear functions, one has $\tilde{\mathbb{E}} f(x) g(x) \leq \sqrt{\tilde{\mathbb{E}} f(x)^2} \cdot \sqrt{\tilde{\mathbb{E}} g(x)^2}$.
+\end{problem}
+
+\begin{problem}[Max cut on the triangle]
+  The three-edge triangle graph has a max-cut value of $2$.
+  We saw in class that there is a quadratic proof that the maximum cut is at most $2.9$.
+  Is there a quadratic proof that the max-cut value is at most $2.00001$?
+  (Prove the correctness of your answer.)
+\end{problem}
+
+
+
+
+\end{document}

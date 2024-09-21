@@ -1,0 +1,208 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem*{lemma*}{Lemma}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+
+% Macros for optimization
+\newcommand{\OPT}{\text{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+
+% Title and author information
+\title{Problem Set 1 -- Solutions}
+\author{Samuel B. Hopkins}
+\date{\today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+
+\begin{problem}[SoS proofs beyond eigenvalues]
+We saw in lecture that if $M \in \mathbb{R}^{n \times n}$ is a symmetric matrix with maximum eigenvalue $\lambda_{max}$, then there is always a degree-2 SoS proof that $x^\top M x \leq \lambda_{max} \cdot \|x\|^2$ -- that is, the polynomial $\lambda_{max} \cdot \|x\|^2 - x^\top M x$ is a sum of squares.
+
+\begin{enumerate}
+\item Show that this bound is tight, in the sense that if $c$ is such that $c \|x\|^2 - x^\top M x$ is a sum of squares, then $c \geq \lambda_{max}$.
+
+\item Construct a symmetric matrix $M$ such that there exists $c < \lambda_{max}(M)$ and linear functions $f_1,\ldots,f_m$ such that $c \cdot \|x\|^2 - x^\top M x = \sum_{i \leq m} f_i(x)^2$ for every $x \in \{ \pm 1\}^n$. This shows that the flexibility in a quadratic proof to use a sum of squares polynomial which is equal to $c \|x\|^2 - x^\top M x$ only for certain $x$s (namely, $x \in \{\pm 1\}^n$) makes the definition more powerful.
+\end{enumerate}
+\end{problem}
+
+\paragraph{Solution, Part 1}
+We begin with the first item.
+Suppose that $c \|x\|^2 - x^\top M x = \sum_{i \leq m} f_i(x)^2$ for some linear functions $f_1,\ldots,f_m$.
+Let $L$ be the matrix whose rows are the vectors $\ell_1,\ldots,\ell_m$ such that $f_i(x) = \iprod{\ell_i,x}$.
+Then the quadratic forms of the matrices $c I - M$ and $L^\top L$ are identical.
+If the quadratic forms of two symmetric matrices are the same, then so are the matrices, so we have $c I - M = L^\top L$, which is to say that all eigenvalues of $c I - M$ are nonnegative.
+Note that $c - \lambda_{\max}$ is an eigenvalue of $c I - M$, so $c - \lambda_{\max} \geq 0$, hence $c \geq \lambda_{\max}$.
+
+\paragraph{Solution, Part 2}
+Consider the matrix $M = \left ( \begin{matrix} 1 & 0 \\ 0 & 0 \end{matrix} \right )$.
+The maximum eigenvalue of $M$ is $1$.
+We claim that $\frac 12 \|x\|^2 - x^\top M x = 0$ for every $x \in \{ \pm 1\}^2$.
+Since $0$ is a (trivial) sum of squares, this will finish the proof.
+Indeed, if $x = (x_1,x_2)$, then $\frac 12 \|x\|^2 - x^\top M x = \frac 12 (x_1^2 + x_2^2) - x_1^2 = 1 - 1 = 0$.
+
+
+\begin{problem}[Max cut in almost-bipartite graphs]
+Show that there is a polynomial-time algorithm with the following guarantee: given a graph $G = (V,E)$ such that there is a cut which cuts $(1-\epsilon)|E|$ edges, the algorithm outputs a cut which cuts $(1-\tilde{O}(\sqrt{\epsilon}))|E|$ edges. $(\tilde{O}$ can hide factors of $\log(1/\epsilon)$, though this is not strictly necessary.)
+
+You may use the following basic anticoncentration fact for Gaussians: if $Z \sim N(0,1)$, then $Pr(|Z| \leq \delta) = O(\delta)$.
+\end{problem}
+
+\paragraph{Solution}
+The algorithm is simply the Goemans-Williamson (GW) Max-Cut algorithm from lecture.
+Let $G = (V,E)$ be a graph with a cut which cuts $(1-\eps)|E|$ edges.
+Let $\pE$ be a pseudoexpectation such that
+\[
+\pE \sum_{(i,j) \in E} \frac 12 - \frac{x_i x_j}{2} \geq (1-\eps) |E| \, .
+\]
+Since the GW algorithm will find such a pseudoexpectation and round it, it will be enough to show that the GW rounding scheme, applied to such a pseudoexpectation, will in expectation produce a cut which cuts $(1 - O(\sqrt{\eps}))|E|$ edges.
+
+We will use the following lemma, whose proof we defer.
+
+\begin{lemma*}
+Let $g,h$ be  multivariate Gaussians distributed as $\cN \left ( 0, \left ( \begin{matrix} 1 & -(1-\rho) \\ -(1-\rho) & 1 \end{matrix} \right ) \right ) $, where $\rho \geq 0$.
+Then $\Pr( \text{sign}(g) \neq \text{sign}(h)) \geq 1 - O(\sqrt{\rho})$.
+\end{lemma*}
+
+Recall that in the rounding phase of the GW algorithm, the probability that the edge $(i,j)$ is cut is the probability that a pair of Gaussians $g,h$ with $\E g = \E h = 0$ and $\E g^2 = \E h^2 = 1$ and $\E gh = \pE x_i x_j$ have opposite signs.
+Let $S$ be the cut produced by the GW algorithm.
+By the lemma, then,
+\[
+  \E |E(S,\overline{S})| \geq \sum_{(i,j) \in E} 1 - O \left ( \sqrt{1 + \pE x_i x_j } \right ) \, .
+\]
+By Cauchy-Schwarz,
+\[
+  \sum_{(i,j) \in E} \sqrt{1+ \pE x_i x_j} \leq \sqrt{|E|} \cdot \sqrt{\sum_{(i,j) \in E} 1 + \pE x_i x_j} = \sqrt{|E|} \cdot \sqrt{|E| + \pE \sum_{(i,j) \in E} x_i x_j} \leq O(\sqrt{\eps} |E|) \, .
+\]
+
+
+\begin{proof}[Proof of Lemma]
+  We can write 
+  \[
+  h = -(1-\rho) g + \sqrt{1-(1-\rho)^2} z  = -(1-\rho) g + \sqrt{2\rho - \rho^2} z \, .
+  \]
+  where $z \sim \cN(0,1)$ is independent of $g$.
+  To have $\text{sign}(g) = \text{sign(h)}$, we have to have $|z| \geq \frac{1-\rho}{\sqrt{2\rho}} |g| = \Omega(|g| / \sqrt{\rho})$.
+  For each fixed $g$, we have $\Pr(|z| \geq \Omega(|g|/ \sqrt{\rho})) = \exp(- \Omega(|g|^2/\rho))$.
+  So,
+  \[
+    \E_{g} \Pr(|z| \geq \Omega(|g|/\sqrt{\rho})) \leq \E_{g} \exp(-\Omega(|g|^2/\rho)) = O(\sqrt \rho) \, .
+  \]
+  where for the last step we used the standard formula
+  \[
+    \E_g \exp(- c g^2) = \frac 1{\sqrt{1+2c}} \, .
+  \]
+\end{proof}
+
+
+
+
+
+\begin{problem}[Cauchy-Schwarz for Pseudoexpectations]
+An important fact about any probability distribution $\mu$ is that for any real-valued $f$ and $g$, $\mathbb{E}_{x \sim \mu} f(x) g(x) \leq \sqrt{\mathbb{E} f(x)^2} \cdot \sqrt{ \mathbb{E} g(x)^2 }$. Show that if $\tilde{\mathbb{E}}$ is a (degree 2) pseudoexpectation and $f,g$ are linear functions, one has $\tilde{\mathbb{E}} f(x) g(x) \leq \sqrt{\tilde{\mathbb{E}} f(x)^2} \cdot \sqrt{\tilde{\mathbb{E}} g(x)^2}$.
+\end{problem}
+
+\paragraph{Solution}
+Fix a degree-2 pseudoexpectation $\pE$ and linear functions $f,g$.
+For any real numbers $\alpha,\beta$, we have
+\[
+  0 \leq \pE (\alpha f + \beta g)^2 = \alpha^2 \pE f^2 + 2 \alpha \beta \pE fg + \beta^2 \pE g^2 \, ,
+\]
+and hence
+\[
+   - 2 \alpha \beta \pE fg \leq \alpha^2 \pE f^2 + \beta^2 \pE g^2 \, .
+\]
+Now take $\alpha^2 = \sqrt{\pE g^2} / \sqrt{\pE f^2}$ and $\beta^2 = \sqrt{\pE f^2} / \sqrt{\pE g^2}$ to get the conclusion.
+
+\begin{problem}[Max cut on the triangle]
+  The three-edge triangle graph has a max-cut value of $2$.
+  We saw in class that there is a quadratic proof that the maximum cut is at most $2.9$.
+  Is there a quadratic proof that the max-cut value is at most $2.00001$?
+  (Prove the correctness of your answer.)
+\end{problem}
+
+\paragraph{Solution}
+There is no such quadratic proof.
+It will suffice to exhibit a degree-2 pseudoexpectation $\pE$ such that $\pE \sum_{(i,j) \in E} \frac 12 - \frac{x_i x_j}{2} \geq 2.01$, where $E$ is the set of edges of the triangle graph.
+We will let $\pE x_1 = \pE x_2 = \pE x_3 = 0$, and $\pE x_i x_j = -0.5$ for $i \neq j$.
+We need to check that this is a valid pseudoexpectation, for which it will suffice to show that the following matrix is positive semidefinite:
+\[
+  \left ( \begin{matrix} 1 & -0.5 & -0.5 \\ -0.5 & 1 & -0.5 \\ -0.5 & -0.5 & 1 \end{matrix} \right ) \, .
+\]
+This matrix is diagonal-dominant, so it is positive semidefinite.
+
+For the $\pE$ we have defined, $\pE \sum_{(i,j) \in E} \frac 12 - \frac{x_i x_j}{2} = \frac 32 + \frac 34 = 2.25$.
+This finishes the proof.
+
+
+\end{document}

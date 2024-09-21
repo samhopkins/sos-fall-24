@@ -1,0 +1,123 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+
+% Macros for optimization
+\newcommand{\OPT}{\text{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+
+% Title and author information
+\title{Peer Review Instructions}
+\author{Samuel B. Hopkins}
+\date{\today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+In addition to solving problem sets, you will provide peer reviews of solutions written by other students.
+You will thereby get to practice the crucial skill of giving feedback on technical writing to help authors clarify their meaning.
+The quality of peer feedback you provide will contribute to your final course grade.
+I will provide you with reference solutions to use when giving feedback.
+Peer reviews are due one week after the deadline of each problem set.
+They will be assigned and completed via Canvas.
+
+\paragraph{Comments}
+Most importantly, you will provide written feedback in your peer review.
+This is an opportunity to help your peers improve their technical mathematics and their writing.
+(And, you may have some realizations about your own solutions in the process.)
+If an equation is incorrect, say so!
+If a sentence or paragraph is confusingly-worded, flag this as well.
+Please be kind but honest in your critiques.
+
+
+\paragraph{Numerical scores}
+For each problem on a problem set, you will assign a score between $0$ and $3$ (inclusive).
+These scores will inform my final grading at the end of the semester.
+As a reminder, courses at MIT are not graded on a curve!
+This means that giving your classmates' solutions lower scores than they deserve is not to your advantage.
+
+The scores have the following meanings:
+
+A score of $3$ indicates near-perfection: the solution is technically correct, and exposition is as clear or clearer than the reference solution.
+This solution would be suitable as the proof of a lemma in a mathematics or computer science journal or conference publication.
+
+A score of $2$ indicates correctness, perhaps with a missing detail or two, and exposition clear enough to be understood.
+This solution would raise eyebrows from a reviewer for a mathematics or computer science journal or conference, but would not prompt serious concerns about correctness.
+
+A score of $1$ indicates that some attempt was made at the problem, but the solution is either technically incorrect or insufficiently clearly exposited to be understood.
+This solution would prompt serious concerns about correctness, if it appeared in a journal or conference submission.
+
+A score of $0$ indicates that no attempt was made at the problem.
+
+
+\end{document}
