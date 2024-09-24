@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+
+% Macros for optimization
+\newcommand{\OPT}{\text{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+
+% Title and author information
+\title{Problem Set 2}
+\author{Samuel B. Hopkins}
+\date{Last updated \today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+Due: 10/??, 11:59pm.
+
+Please typeset your solutions in LaTeX.
+
+\begin{problem}[On $\vDash$, borrowed from Aaron Potechin]
+
+Consider the following polynomial equation in $3$ variables, $x,y,z$.
+\[ (x^2 + 1) y = z^2. \]
+Because it implies $y = \frac{z^2}{x^2+1}$, any solution $(x,y,z)$ to the above must have $y \ge 0$. We will see if sum-of-squares can capture this reasoning.
+
+\begin{enumerate}
+  \item Construct a degree $4$ pseudoexpectation $\pE$ in variables $x,y,z$ such that $\pE \vDash (x^2+1)y = z^2$ but $\pE y < 0$. (Computer-aided proofs are allowed.)
+
+  By $\pE \vDash (x^2+1)y = z^2$, we mean that for any polynomial $p$ of degree at most $1$ in $x,y,z$, $\pE p(x,y,z)(x^2+1)y = \pE p(x,y,z)z^2$.
+
+  \item Despite the above, show that there exists a sum-of-squares refutation to the following system of polynomial inequalities, for any $c > 0$: $\{ (x^2+1)y = z^2 , y \le -c \}$.
+\end{enumerate}
+\end{problem}
+
+\begin{problem}
+  Unreleased.
+\end{problem}
+
+\begin{problem}
+  Unreleased.
+\end{problem}
+
+\end{document}
