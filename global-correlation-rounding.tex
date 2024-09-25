@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{mysty}
+
+\newcommand{\topicname}{Global Correlation Rounding}
+\newcommand{\myname}{}
+
+\title{6.S977 Lecture 5: Global Correlation Rounding}
+\author{}
+\date{Last updated \today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\section{Constraint Satisfaction Problems}
+
+In this lecture, we will discuss another approach for rounding pseudoexpectations. In contrast to the Gaussian rounding strategy used in the Goemans-Williamson algorithm for max-cut, this time we will make use of higher-order moments of $\pE$.	The setting we will consider will be that of $2$-constraint satisfaction problems ($2$-CSPs), a generalization of max-cut.
+
+\begin{fpr}[Constraint satisfaction problem]
+	An instance of a \emph{$2$-CSP} is given by a collection of functions $\phi = (\phi_{ij})_{i,j \in [n]}$ where each $\phi_{ij} : [q] \times [q] \to \{0,1\}$. The goal will be to maximize, over $x \in [q]^n$, the value of $\sum_{i,j}\phi_{ij}(x_i,x_j)$. We further denote the maximum by $\OPT$.
+\end{fpr}
+
+It is not difficult to see that the above is a strict generalization of max-cut.
+
+\begin{fex}[Max-cut as a CSP]
+	Let $G$ be a graph, and consider the $2$-CSP with alphabet size $q = 2$, given by
+	\[ \phi_{ij}(x_i,x_j) = \begin{cases} 0, & x_i = x_j, \\ 1, & x_i \ne x_j \end{cases} \]
+	for $ij \in E$, and $\phi_{ij} \equiv 0$ for $ij\not\in E$. Then, for $x \in \{0,1\}^n$, $\sum_{i,j} \phi_{ij}(x_i,x_j)$ is precisely the cut value associated to the cut $\left( \{i : x_i = 0\} , \{i : x_i = 1\} \right)$.
+
+	More generally, for the alphabet being $[q]$ for $q\ge 2$, the above CSP attempts to find a $q$-coloring that violates the fewest edges, that is, minimizes the size of $\{ ij \in E : x_i = x_j \}$.
+\end{fex}
+
+The main result that we will discuss in this section, due to Barak-Raghavendra-Steurer \cite{BRS11}, is the following.
+
+\begin{ftheo}
+	Let $\phi$ be a $2$-CSP on alphabet $[q]$. Then, for any $\eps > 0$, there exists an algorithm that outputs $x$ such that
+	\[ \sum_{i,j} \phi_{ij}(x_i,x_j) \ge \OPT - \eps n^2 \]
+	that runs in time $(nq)^{O\left( \frac{\log q}{\eps^2} \right)}$.
+\end{ftheo}
+
+In fact, the running time in the above algorithm can be improved to $2^{O\left( \frac{\log q}{\eps^2} \right)} \cdot (nq)^{O(1)}$, which is polynomial in $n$ and $q$.
+While we will not discuss the details thereof, this improvement involves designing a problem-specific semidefinite program solver, instead of blackbox using the ellipsoid algorithm that we saw in previous lectures. We refer the interested reader to \cite{???}.
+
+The above algorithm provides a ``polynomial time approximation scheme'' (PTAS) for \emph{dense} CSPs, where the optimum $\OPT$ is $\Omega(n^2)$. This is the case, for example, in max-cut on dense graphs with $\Omega(n^2)$ edges. While this was not the first approximation for max-cut on dense graphs, we will later see that the ideas here will generalize to certain non-dense graphs as well, such as expanders. \\
+
+Given our discussion of max-cut and the sum-of-squares hierarchy, we now have a blueprint for designing optmization algorithms using sum-of-squares. We begin by encoding our constraints (here some proxy for $x_i \in [q]$) as low-degree polynomials, then search for pseudoexpectations that satisfy these constraints and maximize the objective polynomial.
+
+How can we encode $x_i \in [q]$ for all $i \in [n]$? We shall consider a ``one-hot'' encoding of this constraint, by introducing variables $y_{ia}$ for $i \in [n]$ and $a \in [q]$, indicating whether $x_i = a$, and enforce that the $y_{ia}$ are in $\{0,1\}$, and that exactly one of the $(y_{ia})_{a \in [q]}$ is equal to $1$ (for any fixed $i \in [n]$). More concretely, consider the system of polynomials
+\[ \mathcal{P}_{[q]^n} \defeq
+\left\{
+\begin{array}{c}
+	y_{ia}^2 = y_{ia} \text{ for all } i \in [n], a \in [q], \\
+	\sum_{a \in [q]} y_{ia} = 1 \text{ for all } i \in [n]
+\end{array}
+\right\}. \]
+Furthermore, for $(y_i),(y_j)$ satisfying the above constraints, we abuse notation to denote by $\phi_{ij}$ the same function given by
+\[ \phi_{ij}(y_i,y_j) = \sum_{a,b \in [q]} \phi_{ij}(a,b) y_{ia} y_{jb}. \]
+Note that this is a degree $2$ polynomial in the $(y_{ia})$.\\
+
+As usual, we try to maximize $c$ such that there exists a pseudoexpectation $\pE$ such that
+\[ \pE \vDash \mathcal{P}_{[q]^n} \cup \left\{ \sum_{i,j \in [n]} \phi_{ij}(y_i,y_j) \ge c \right\}. \]
+An alternative similar expression would be to search for a pseudoexpectation satisfying $\mathcal{P}_{[q]^n}$ that maximizes $\pE \sum_{i,j \in [n]} \phi_{ij}(y_i,y_j)$. However, this will cause issues later in the argument -- in some sense, this maximizes the (pseudo)expected CSP value, while the expression we will use searches over (pseudo)distributions that are only supported on $(y_{ia})$ with large CSP value.
+
+The rest of the game boils down to intelligently rounding the pseudoexpectation to a real distribution, and show that this rounding does not lose too much in the objective value. In the Goemans-Williamson algorithm, we saw Gaussian rounding. In this lecture, we will see \emph{global correlation rounding}. 
+
+\section{Local Distributions and Independent Rounding}
+
+First, we will lay some groundwork, and in the process see another respect in which pseudoexpectations act like the moments of actual distributions on $\{0,1\}^n$.
+
+\begin{flem}[Local Distributions]
+	Let $\pE$ be a pseudoexpectation of degree $d$. For every $|S| \subseteq [n]$ with $|S| \leq d/2$, there is a \emph{real} distribution $\mu_S$ over $[q]^S$ such that for every $a_S = (a_i)_{i \in S}$ in $[q]^S$,
+	\[ \Pr_{x_S \mid \mu_S} \left[ x_i = a_i \text{ for all } i \in S \right] = \pE \prod_{i \in S} y_{i a_i}. \]
+\end{flem}
+In other words, any pseudodistribution is ``locally'' a real distribution. For the remainder of this document, we shall denote these ``local distributions'' by $(\mu_S)$.
+\begin{proof}
+	We have for any $a_S = (a_i)_{i \in S}$ that
+	\[ \pE \prod_{i \in S} y_{i a_i} = \pE \prod_{i \in S} y_{i a_i}^2 \ge 0. \]
+	Furthermore,
+	\[ \sum_{a_S \in [q]^S} \pE \prod_{i \in S} y_{i a_i} = \pE \sum_{a_S \in [q]^S} \prod_{i \in S} y_{i a_i} = \pE \prod_{i \in S} \left( \sum_{a \in [q]} y_{ia} \right) = 1, \]
+	where the final inequality follows because $\pE \vDash \sum_{a \in [q]} y_{ia} = 1$ for all $i \in [n]$.
+	This implies that the distribution $\mu_S$ defined as in the lemma statement is an actual distribution, as desired.
+\end{proof}
+
+\begin{remark}
+	This does \emph{not} imply that there exists a single distribution $\mu$ over $[q]^n$ that is consistent with $\pE$. Indeed, were this the case, every pseudodistribution would be a real distribution. While there exist well-defined \emph{local} distribution for every small set $S$, there is no guarantee that these local distributions can be ``stitched together'' to form a consistent local distribution.
+\end{remark}
+
+The above lemma suggests a simple rounding scheme: for each $i \in [n]$, independently draw $y_i \sim \mu_{\{i\}}$. This is not as silly as it may seem; in fact, many "randomized rounding" schemes for linear programs have this flavor and result in non-trivial algorithms.
+
+Of course, the issue with this rounding scheme is that it loses all information about the higher-order correlations in $\pE$ -- the joint distributions $(y_i,y_j)$ will have independent coordinates, while the joint ($2$-local) distributions $\mu_{\{i,j\}}$ coming from $\pE$ need not be. Expressing the same concept in terms of pseudoexpectation values rather than local distributions, we expect
+\[ \Pr_{\substack{x_i \sim \mu_{\{i\}} \\ x_j \sim \mu_{\{j\}}}}[x_i = a, x_j = b] = \Pr_{x_i \sim \mu_{\{i\}}}[x_i = a] \cdot \Pr_{x_j \sim \mu_{\{j\}}}[x_j = b] = \pE y_{ia} \pE y_{jb} \]
+and $\pE y_{ia} y_{jb}$ to be different.
+
+Nevertheless, let us imagine for a moment that all such issues are absent, and proceed with an analysis. We have
+
+\begin{align*}
+	\pE \sum_{i,j} \phi(x_i,x_j) &= \sum_{i,j} \pE \phi(x_i,x_j) \\
+		&= \sum_{i,j} \E_{(x_i,x_j) \sim \mu_{\{i,j\}}} \phi(x_i,x_j) \\
+		&= \sum_{i,j} \E_{\substack{x_i \sim \mu_{\{i\}} \\ x_j \sim \mu_{\{j\}}}} \phi(x_i,x_j) - \sum_{i,j} \left(\E_{\substack{x_i \sim \mu_{\{i\}} \\ x_j \sim \mu_{\{j\}}}} \phi(x_i,x_j) - \E_{(x_i,x_j) \sim \mu_{\{i,j\}}} \phi(x_i,x_j)\right) \\
+		&\ge \OPT - \sum_{i,j} \dtv{ \mu_{\{i\}} \otimes \mu_{\{j\}} }{ \mu_{\{i,j\}} }.
+\end{align*}
+Here, the final inequality follows from the property of the total variation distance that for distributions $\pi,\nu$ over $\Omega$,
+\[ \dtv{\pi}{\nu} = \sup_{f : \Omega \to [0,1]} \E_{\pi}[f] - \E_{\nu}[f], \]
+and $\phi_{ij}$ takes values in $[0,1]$ ($\{0,1\}$, in fact).
+
+As expected, the distribution not having the higher-order correlations of $\pE$ is causing issues. Indeed, the second term we are subtracting could be very large, potentially $\Omega(n^2)$.\footnote{Indeed, considering the distribution $\pi$ over $\{0,1\}^2$ that takes $(0,1)$ with probability $1/2$ and $(1,0)$ with probability $1/2$, the total variation distance between $\pi$ and $\pi_{\{1\}} \otimes \pi_{\{2\}}$ is $1/2$.}
+
+However, this presents us with a concrete goal! Can we somehow manipulate the pseudodistribution $\pE$ in a way that preserves the objective value, but reduces the average correlation between pairs of coordinates?
+
+\section{Conditioning}
+
+Now, we shall introduce another way in which pseudodistributions behave like real distributions -- we can \emph{condition} on events, provided that the events can be expressed by low-degree polynomials.
+
+\begin{lemma}
+	Let $\pE$ be a degree $d$ pseudodistribution over variables, such that $\pE y_{ia} > 0$. Then, the pseudodistribution $\pE[ \cdot \mid y_{ia} = 1 ]$ defined by
+	\[ \pE \left[ p(y) \mid y_{ia} = 1 \right] = \frac{\pE p(y) y_{ia}}{\pE y_{ia}} \]
+	is indeed a pseudodistribution of degree $d-2$. Furthermore, this conditioned pseudodistribution satisfies any constraints that $\pE$ did.
+\end{lemma}
+
+We leave the proof of the above as an exercise to the reader.
+
+The idea for the final rounding algorithm is as follows. Starting with some pseudoexpectation, we repeatedly pick a random coordinate in $[n]$, and pin the value of $x_i$ according to the correct conditional (local) distribution (more concretely, we pick $a \sim \mu_{\{i\}}$, and condition on $y_{ia} = 1$). We will show that after some $\poly(q,1/\eps)$ steps, this algorithm outputs a pseudodistribution $\pE'$ (with local distributions $(\mu_S')$) with small pairwise correlations, in that
+\[ \sum_{i,j \in [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } \le \eps n^2. \]
+Why should this happen? Suppose instead that we are at a pseudodistribution that does not satisfy the above low-correlation guarantee. Then, for a randomly chosen coordinate $i$, we have $ \sum_{j \in [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } > \eps n$ -- the $i$th coordinate is non-trivially correlated with a lot of other coordinates $j$. Intuitively, this means that if you learn the value of the $i$th coordinate in a sample from $\mu$, you would also learn a lot about the values of the other coordinates, thus driving down correlations.
+
+Before we proceed with the proof, let us state the lemma that we will prove, known as the pinning lemma in statistical physics literature (where it was first introduced) and the global correlation lemma in sum-of-squares literature.
+
+\begin{flem}[Global correlation rounding]
+	Let $\pE_0$ be an arbitrary pseudodistribution of degree at least $2T + 4$, for $T \defeq O\left( \frac{\log q}{\eps^2} \right)$. For $0 \le t \le T$, let $\pE_{t+1}$ be the (random) pseudodistribution obtained by picking a uniformly random $i \sim [n]$, $a_i \sim \mu_{\{i\}}$, and setting $\pE_{t+1}[\cdot] = \pE_t[\cdot \mid y_{ia_i} = 1]$. Then, letting $(\mu')_{\substack{S \subseteq [n] \\ |S| \le 2}}$ be the local distributions of $\pE_{T}$, it holds that
+	\[ \E_{\text{choices of pinning}} \sum_{i,j} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} }  \leq \eps n^2. \]
+\end{flem}
+
+
+\bibliographystyle{alpha}
+\bibliography{refs}
+
+\end{document}
