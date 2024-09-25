@@ -122,13 +122,16 @@ Now, we shall introduce another way in which pseudodistributions behave like rea
 We leave the proof of the above as an exercise to the reader.
 
 The idea for the final rounding algorithm is as follows. Starting with some pseudoexpectation, we repeatedly pick a random coordinate in $[n]$, and pin the value of $x_i$ according to the correct conditional (local) distribution (more concretely, we pick $a \sim \mu_{\{i\}}$, and condition on $y_{ia} = 1$). We will show that after some $\poly(q,1/\eps)$ steps, this algorithm outputs a pseudodistribution $\pE'$ (with local distributions $(\mu_S')$) with small pairwise correlations, in that
-\[ \sum_{i,j \in [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } \le \eps n^2. \]
+\begin{equation}
+	\label{eq:low-global-corr}
+	\sum_{i,j \in [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } \le \eps n^2.
+\end{equation}
 Why should this happen? Suppose instead that we are at a pseudodistribution that does not satisfy the above low-correlation guarantee. Then, for a randomly chosen coordinate $i$, we have $ \sum_{j \in [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } > \eps n$ -- the $i$th coordinate is non-trivially correlated with a lot of other coordinates $j$. Intuitively, this means that if you learn the value of the $i$th coordinate in a sample from $\mu$, you would also learn a lot about the values of the other coordinates, thus driving down correlations.
 
 Before we proceed with the proof, let us state the lemma that we will prove, known as the pinning lemma in statistical physics literature (where it was first introduced) and the global correlation lemma in sum-of-squares literature.
 
 \begin{flem}[Global correlation rounding]
-	Let $\pE_0$ be an arbitrary pseudodistribution of degree at least $2T + 4$, for $T \defeq O\left( \frac{\log q}{\eps^2} \right)$. For $0 \le t \le T$, let $\pE_{t+1}$ be the (random) pseudodistribution obtained by picking a uniformly random $i \sim [n]$, $a_i \sim \mu_{\{i\}}$, and setting $\pE_{t+1}[\cdot] = \pE_t[\cdot \mid y_{ia_i} = 1]$. Then, letting $(\mu')_{\substack{S \subseteq [n] \\ |S| \le 2}}$ be the local distributions of $\pE_{T}$, it holds that
+	Let $\pE_0$ be an arbitrary pseudodistribution of degree at least $2T + 4$, for $T \defeq O\left( \frac{\log q}{\eps^2} \right)$. For $0 \le t \le T$, let $\pE_{t+1}$ be the (random) pseudodistribution obtained as follows. If $\pE_{t}$ satisfies \eqref{eq:low-global-corr}, set $\pE_{(t+1)} = \pE_t$. Otherwise, pick a uniformly random $i \sim [n]$, $a_i \sim \mu_{\{i\}}$, and set $\pE_{t+1}[\cdot] = \pE_t[\cdot \mid y_{ia_i} = 1]$. Then, letting $(\mu')_{\substack{S \subseteq [n] \\ |S| \le 2}}$ be the local distributions of $\pE_{T}$, it holds that
 	\[ \E_{\text{choices of pinning}} \sum_{i,j} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} }  \leq \eps n^2. \]
 \end{flem}
 
