@@ -38,6 +38,7 @@
 \newtheorem{remark}[theorem]{Remark}
 \theoremstyle{definition}
 \newtheorem{problem}[theorem]{Problem}
+\newtheorem{bproblem}[theorem]{Bonus Problem}
 \newtheorem*{question}{Question}
 \newtheorem{exercise}[theorem]{Exercise}
 
@@ -105,11 +106,37 @@ Because it implies $y = \frac{z^2}{x^2+1}$, any solution $(x,y,z)$ to the above 
 
 \begin{problem}
   Suppose $\pE$ is a pseudoexpectation of degree $d$, with $d$ even, and $\pE \vDash p \leq 0, p \geq 0$ for some polynomial $p$. (Informally, we have been writing $\pE \vDash p = 0$.)
-  Show that for every $q$ such that the degree of $pq$ is at most $d$, we have $\pE pq = 0$.
+  Show that if $p$ has even degree, for every $q$ such that the degree of $pq$ is at most $d$, we have $\pE pq = 0$. Similarly, show that if $p$ has odd degree, for every $q$ such that the degree of $pq$ is at most $d-1$, we have $\pE pq = 0$.
 \end{problem}
+
 
 \begin{problem}
   Unreleased.
 \end{problem}
+
+\begin{bproblem}[Integrality gaps for max-cut, borrowed from Pravesh Kothari]
+  Let $C_n$ be the cycle graph on vertex set $[n]$ with edge set $E$. Further suppose that $n$ is odd.
+  The size of the max-cut in $C_n$ is $n-1$. Recall from your solution to Problem 2 of the first problem set that this implies that for any degree $2$ pseudoexpectation $\pE$ on $\{\pm 1\}^n$, $\pE\left[ \frac{1}{4} \sum_{ij \in E} (x_i - x_j)^2 \right] \le \left(1 - O\left( \frac{1}{n^2} \right)\right) n$. We will start by seeing that this is tight for degree $2$ pseudoexpectations.
+
+  Let $L$ the Laplacian of $C_n$ defined by $L_{ii} = 2$ for each $i$, and $L_{ij}$ is $-1$ if $ij$ is an edge and $0$ otherwise. Observe that for $x \in \{\pm 1\}^n$, the size of the cut associated to $x$ is equal to $\frac{1}{4} \cdot x^\top L x$.
+
+  For each $0 \le k \le n/2$, let $x_k,y_k$ be vectors with coordinates $(x_k)_i = \cos(2\pi ik/n)$ and $(y_k)_i = \sin(2\pi ik/n)$.
+
+
+  \begin{enumerate}
+    \item Prove that $x_k$ and $y_k$ are eigenvectors of $L$ with eigenvalues $2 - 2 \cos(2\pi k/n)$.
+    \item Prove that the diagonal entries of the matrix $M_k = x_k x_k^\top + y_k y_k^\top$ are $1$.
+    \item Prove that there is a degree $2$ pseudoexpectation $\pE_k$ on $\{\pm1\}^n$ with $\pE x = 0$ and $\pE xx^\top = M_k$. Using this, prove that for $k = \frac{n-1}{2}$, $\pE \left[ \frac{1}{4} \sum_{ij \in E} (x_i - x_j)^2 \right] \ge \left( 1 - O\left( \frac{1}{n^2} \right) \right) n$.
+  \end{enumerate}
+
+  Next, we will see that degree $6$ pseudoexpectations do not face such barriers (for the cycle graph).
+
+  \begin{enumerate}
+    \setcounter{enumi}{3}
+    \item Prove that for degree $6$ pseudoexpectations $\pE$ over $\{\pm 1\}^n$, the squared triangle inequality holds: $\pE (x_i - x_j)^2 \le \pE (x_i - x_k)^2 + \pE (x_k - x_j)^2$. For a harder exercise, prove this for degree $4$ pseudoexpectations.
+    \item Prove that for any degree $6$ pseudoexpectation $\pE$, $\pE \left[ \frac{1}{4} \sum_{ij \in E} (x_i - x_j)^2 \right] \le n-1$.
+  \end{enumerate}
+
+\end{bproblem}
 
 \end{document}
