@@ -5,6 +5,8 @@
 \newcommand{\topicname}{Global Correlation Rounding}
 \newcommand{\myname}{}
 
+\newcommand{\GI}{\operatorname{GI}}
+
 \title{6.S977 Lecture 5: Global Correlation Rounding}
 \author{}
 \date{Last updated \today}
@@ -35,13 +37,14 @@ It is not difficult to see that the above is a strict generalization of max-cut.
 The main result that we will discuss in this section, due to Barak-Raghavendra-Steurer \cite{BRS11}, is the following.
 
 \begin{ftheo}
+	\label{th:dense-csps}
 	Let $\phi$ be a $2$-CSP on alphabet $[q]$. Then, for any $\eps > 0$, there exists an algorithm that outputs $x$ such that
 	\[ \sum_{i,j} \phi_{ij}(x_i,x_j) \ge \OPT - \eps n^2 \]
 	that runs in time $(nq)^{O\left( \frac{\log q}{\eps^2} \right)}$.
 \end{ftheo}
 
-In fact, the running time in the above algorithm can be improved to $2^{O\left( \frac{\log q}{\eps^2} \right)} \cdot (nq)^{O(1)}$, which is polynomial in $n$ and $q$.
-While we will not discuss the details thereof, this improvement involves designing a problem-specific semidefinite program solver, instead of blackbox using the ellipsoid algorithm that we saw in previous lectures. We refer the interested reader to \cite{???}.
+In fact, the running time in the above algorithm can be improved to $q^{O\left( \frac{\log q}{\eps^2} \right)} \cdot n^{O(1)}$, which is polynomial in $n$.
+While we will not discuss the details thereof, this improvement involves designing a problem-specific semidefinite program solver, instead of blackbox using the ellipsoid algorithm that we saw in previous lectures. We refer the interested reader to \cite{GS12} (also see \cite{OGT13}).
 
 The above algorithm provides a ``polynomial time approximation scheme'' (PTAS) for \emph{dense} CSPs, where the optimum $\OPT$ is $\Omega(n^2)$. This is the case, for example, in max-cut on dense graphs with $\Omega(n^2)$ edges. While this was not the first approximation for max-cut on dense graphs, we will later see that the ideas here will generalize to certain non-dense graphs as well, such as expanders. \\
 
@@ -61,19 +64,22 @@ Note that this is a degree $2$ polynomial in the $(y_{ia})$.\\
 
 As usual, we try to maximize $c$ such that there exists a pseudoexpectation $\pE$ such that
 \[ \pE \vDash \mathcal{P}_{[q]^n} \cup \left\{ \sum_{i,j \in [n]} \phi_{ij}(y_i,y_j) \ge c \right\}. \]
-An alternative similar expression would be to search for a pseudoexpectation satisfying $\mathcal{P}_{[q]^n}$ that maximizes $\pE \sum_{i,j \in [n]} \phi_{ij}(y_i,y_j)$. However, this will cause issues later in the argument -- in some sense, this maximizes the (pseudo)expected CSP value, while the expression we will use searches over (pseudo)distributions that are only supported on $(y_{ia})$ with large CSP value.
+Obviously, the maximum such $c$ is at least $\OPT$.
 
-The rest of the game boils down to intelligently rounding the pseudoexpectation to a real distribution, and show that this rounding does not lose too much in the objective value. In the Goemans-Williamson algorithm, we saw Gaussian rounding. In this lecture, we will see \emph{global correlation rounding}. 
+An alternative similar expression would involve searching for a pseudoexpectation satisfying $\mathcal{P}_{[q]^n}$ that maximizes $\pE \sum_{i,j \in [n]} \phi_{ij}(y_i,y_j)$. However, this will cause issues later in the argument -- in some sense, this maximizes the (pseudo)expected CSP value, while the expression we will use searches over (pseudo)distributions that are only supported on $(y_{ia})$ with large CSP value.
+
+The rest of the game boils down to intelligently rounding the pseudoexpectation to a real distribution, and showing that this rounding does not lose too much in the objective value. In the Goemans-Williamson algorithm, we saw Gaussian rounding. In this lecture, we will see \emph{global correlation rounding}. 
 
 \section{Local Distributions and Independent Rounding}
 
 First, we will lay some groundwork, and in the process see another respect in which pseudoexpectations act like the moments of actual distributions on $\{0,1\}^n$.
 
 \begin{flem}[Local Distributions]
+	\label{lem:local-distributions}
 	Let $\pE$ be a pseudoexpectation of degree $d$. For every $|S| \subseteq [n]$ with $|S| \leq d/2$, there is a \emph{real} distribution $\mu_S$ over $[q]^S$ such that for every $a_S = (a_i)_{i \in S}$ in $[q]^S$,
 	\[ \Pr_{x_S \mid \mu_S} \left[ x_i = a_i \text{ for all } i \in S \right] = \pE \prod_{i \in S} y_{i a_i}. \]
 \end{flem}
-In other words, any pseudodistribution is ``locally'' a real distribution. For the remainder of this document, we shall denote these ``local distributions'' by $(\mu_S)$.
+In other words, any pseudodistribution is ``locally'' a real distribution. We shall typically denote these ``local distributions'' by $(\mu_S)$.
 \begin{proof}
 	We have for any $a_S = (a_i)_{i \in S}$ that
 	\[ \pE \prod_{i \in S} y_{i a_i} = \pE \prod_{i \in S} y_{i a_i}^2 \ge 0. \]
@@ -84,7 +90,9 @@ In other words, any pseudodistribution is ``locally'' a real distribution. For t
 \end{proof}
 
 \begin{remark}
-	This does \emph{not} imply that there exists a single distribution $\mu$ over $[q]^n$ that is consistent with $\pE$. Indeed, were this the case, every pseudodistribution would be a real distribution. While there exist well-defined \emph{local} distribution for every small set $S$, there is no guarantee that these local distributions can be ``stitched together'' to form a consistent local distribution.
+	This does \emph{not} imply that there exists a single distribution $\mu$ over $[q]^n$ that is consistent with $\pE$. Indeed, were this the case, every pseudodistribution would be a real distribution. While there exist well-defined \emph{local} distributions for every small set $S$, there is no guarantee that these local distributions can be ``stitched together'' to form a consistent local distribution.
+
+	As an exercise, show that these local distributions are consistent among themselves, in that for $T \subseteq S \subseteq [n]$ with $|S| \le d/2$, the marginal of $\mu_S$ on $T$ is equal to $\mu_T$.
 \end{remark}
 
 The above lemma suggests a simple rounding scheme: for each $i \in [n]$, independently draw $y_i \sim \mu_{\{i\}}$. This is not as silly as it may seem; in fact, many "randomized rounding" schemes for linear programs have this flavor and result in non-trivial algorithms.
@@ -102,12 +110,12 @@ Nevertheless, let us imagine for a moment that all such issues are absent, and p
 		&\ge \OPT - \sum_{i,j} \dtv{ \mu_{\{i\}} \otimes \mu_{\{j\}} }{ \mu_{\{i,j\}} }.
 \end{align*}
 Here, the final inequality follows from the property of the total variation distance that for distributions $\pi,\nu$ over $\Omega$,
-\[ \dtv{\pi}{\nu} = \sup_{f : \Omega \to [0,1]} \E_{\pi}[f] - \E_{\nu}[f], \]
+\[ \dtv{\pi}{\nu} = \sup_{\substack{f : \Omega \to [0,1] \\ \text{measurable}}} \E_{\pi}[f] - \E_{\nu}[f], \]
 and $\phi_{ij}$ takes values in $[0,1]$ ($\{0,1\}$, in fact).
 
-As expected, the distribution not having the higher-order correlations of $\pE$ is causing issues. Indeed, the second term we are subtracting could be very large, potentially $\Omega(n^2)$.\footnote{Indeed, considering the distribution $\pi$ over $\{0,1\}^2$ that takes $(0,1)$ with probability $1/2$ and $(1,0)$ with probability $1/2$, the total variation distance between $\pi$ and $\pi_{\{1\}} \otimes \pi_{\{2\}}$ is $1/2$.}
+As expected, the distribution not having the higher-order correlations of $\pE$ is causing issues. Indeed, the second term we are subtracting could be very large, potentially $\Omega(n^2)$.\footnote{Considering the distribution $\pi$ over $\{0,1\}^2$ that takes $(0,1)$ with probability $1/2$ and $(1,0)$ with probability $1/2$, the total variation distance between $\pi$ and $\pi_{\{1\}} \otimes \pi_{\{2\}}$ is $1/2$.}
 
-However, this presents us with a concrete goal! Can we somehow manipulate the pseudodistribution $\pE$ in a way that preserves the objective value, but reduces the average correlation between pairs of coordinates?
+However, this presents us with a concrete goal! Can we somehow manipulate the pseudodistribution $\pE$ in a way that reduces the average correlation between pairs of coordinates, but preserves the objective value?
 
 \section{Conditioning}
 
@@ -121,20 +129,100 @@ Now, we shall introduce another way in which pseudodistributions behave like rea
 
 We leave the proof of the above as an exercise to the reader.
 
-The idea for the final rounding algorithm is as follows. Starting with some pseudoexpectation, we repeatedly pick a random coordinate in $[n]$, and pin the value of $x_i$ according to the correct conditional (local) distribution (more concretely, we pick $a \sim \mu_{\{i\}}$, and condition on $y_{ia} = 1$). We will show that after some $\poly(q,1/\eps)$ steps, this algorithm outputs a pseudodistribution $\pE'$ (with local distributions $(\mu_S')$) with small pairwise correlations, in that
+The idea for the final rounding algorithm is as follows. Starting with some pseudoexpectation, we repeatedly pick a random coordinate in $[n]$, and pin the value of $x_i$ according to the correct conditional (local) distribution (more concretely, we pick $a \sim \mu_{\{i\}}$, and condition on $y_{ia} = 1$). We will show that after some $\poly(\log q,1/\eps)$ steps, this algorithm outputs a pseudodistribution $\pE'$ (with local distributions $(\mu_S')$) with small pairwise correlations, in that
 \begin{equation}
 	\label{eq:low-global-corr}
 	\sum_{i,j \in [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } \le \eps n^2.
 \end{equation}
 Why should this happen? Suppose instead that we are at a pseudodistribution that does not satisfy the above low-correlation guarantee. Then, for a randomly chosen coordinate $i$, we have $ \sum_{j \in [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } > \eps n$ -- the $i$th coordinate is non-trivially correlated with a lot of other coordinates $j$. Intuitively, this means that if you learn the value of the $i$th coordinate in a sample from $\mu$, you would also learn a lot about the values of the other coordinates, thus driving down correlations.
 
-Before we proceed with the proof, let us state the lemma that we will prove, known as the pinning lemma in statistical physics literature (where it was first introduced) and the global correlation lemma in sum-of-squares literature.
+To conclude the proof of \Cref{th:dense-csps}, we shall prove the following lemma, known as the pinning lemma in statistical physics literature (where it was first introduced) and the global correlation lemma in sum-of-squares literature.
 
-\begin{flem}[Global correlation rounding]
-	Let $\pE_0$ be an arbitrary pseudodistribution of degree at least $2T + 4$, for $T \defeq O\left( \frac{\log q}{\eps^2} \right)$. For $0 \le t \le T$, let $\pE_{t+1}$ be the (random) pseudodistribution obtained as follows. If $\pE_{t}$ satisfies \eqref{eq:low-global-corr}, set $\pE_{(t+1)} = \pE_t$. Otherwise, pick a uniformly random $i \sim [n]$, $a_i \sim \mu_{\{i\}}$, and set $\pE_{t+1}[\cdot] = \pE_t[\cdot \mid y_{ia_i} = 1]$. Then, letting $(\mu')_{\substack{S \subseteq [n] \\ |S| \le 2}}$ be the local distributions of $\pE_{T}$, it holds that
-	\[ \E_{\text{choices of pinning}} \sum_{i,j} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} }  \leq \eps n^2. \]
+\begin{flem}[Global correlation lemma]
+	\label{lem:global-corr-lem}
+	Let $\pE$ be an arbitrary pseudodistribution of degree at least $2T + 4$, for $T \defeq O\left( \frac{\log q}{\eps^2} \right)$. Let $\pE'$ be the (random) pseudodistribution obtained as follows. Starting with $\pE_0 = \pE$, for $0 \le t \le T$, do the following. If $\pE_{t}$ satisfies \eqref{eq:low-global-corr} or $t = T$, output $\pE' = \pE_{t}$. Otherwise, denoting by $\left(\mu^{(t)}_{\{i\}}\right)_{i \in [n]}$ the local distributions of $\pE_t$, pick a uniformly random $i \sim [n]$, $a_i \sim \mu_{\{i\}}$, and set $\pE_{t+1}[\cdot] = \pE_t[\cdot \mid y_{ia_i} = 1]$.
+	Letting $(\mu')_{\substack{S \subseteq [n] \\ |S| \le 2}}$ be the local distributions of $\pE'$, it holds that
+	\[ \E_{\text{choices of pinning}} \sum_{i,j} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} }  \leq O(\eps n^2). \]
 \end{flem}
 
+\section{Proof of the global correlation lemma}
+
+Before we start with the proof, we quickly cover the basics of information theory for the unfamiliar reader.
+
+\begin{tcolorbox}[title={A Crash Course on Information Theory}]
+	Let $Z,W$ be discrete random variables taking values in $[q]$, with probability density function $p_{Z,W} : [q] \times [q] \to \R_{\ge 0}$. Also let $p_{Z}$ and $p_{W}$ the density function of the marginal on $Z$ and $W$. Then, the \emph{entropy} of $Z$ is defined by
+	\[ H(Z) \defeq \sum_{a \in [q]} - p_Z(a) \log p_Z(a), \]
+	where we use the convention $0 \log 0 = 0$, and all $\log$s are in base $e$.The entropy of a random variable is a measure of ``how random'' it is, and is non-negative. Indeed, reinforcing this intuition that the entropy corresponds to randomness, it is maximized by the uniform distribution on $[q]$, which has an entropy of $\log q$. 
+
+	Given an event $\mathcal{E}$, we denote $H(Z \mid \mathcal{E}) = H(\{Z \mid \mathcal{E}\})$, where $\{Z \mid \mathcal{E}\}$ is the random variable obtaining by conditioning $Z$ on $\mathcal{E}$. More generally, the \emph{conditional entropy} is given by
+	\[ H(Z\mid W) = \E_{w \sim W} H\left( Z \mid W = w \right). \]
+	This is a measure of how much randomness is ``left in $Z$'' after we condition on the value of $W$.
+
+	We also define the \emph{mutual information}
+	\[ I(Z;W) = H(Z) - H(Z \mid W), \]
+	which is a measure of how much knowing the value of $W$ influences one's knowledge of the value of $Z$. The mutual information is non-negative and symmetric. Like the entropy, it is in $[0, \log q]$.
+
+	Finally, a consequence of Pinsker's inequality is that
+	\begin{equation}
+		\label{eq:pinsker-ineq}
+		\dtv{P_{Z,W}}{P_{Z} \otimes P_W} \le \sqrt{ \frac{1}{2} I(Z;W) }.
+	\end{equation}
+\end{tcolorbox}
+
+Let us prove \Cref{lem:global-corr-lem}. For $0 \le t \le T$, let $\pE_t$ be the random pseudodistribution obtained after $t$ rounds of pinning. We now introduce some notation, some of which we will abuse. Let $X_i^{(t)}$ denote the local distribution of $\pE_t$ on $x_i$; we shall also use $(X_i^{(t)},X_j^{(t)})$ to mean the local distribution on $(x_i,x_j)$ according to $\pE_t$. This abuse is not inconsistent (in that it is okay to use the same letter $X_i^{(t)}$ in both places) due to the exercise in the remark after \Cref{lem:local-distributions}. In particular, since these are legitimately random variables, we may talk about the entropy of $H(X_i^{(t)})$ and the mutual information $I(X_i^{(t)};X_j^{(t)})$.
+
+
+Consider the potential function
+\[ \psi^{(t)} \defeq \E_{\substack{\text{choices of pinnings} \\ \text{up to time $t$}}} \left[ \E_{i \sim [n]} H(X_i^{(t)}) \right]. \]
+We will show that this potential function is decaying, and if something looking like the average pairwise correlations is large, it decays fast. Towards this, define the \emph{global information}
+\[ \GI^{(t)} = \E_{\substack{\text{choices of pinnings} \\ \text{up to time $t$}}} \E_{i,j \sim [n]} I( X_i^{(t)} ; X_j^{(t)} ). \]
+We will show that
+\[ \psi^{(t)} - \psi^{(t+1)} = \GI^{(t)}. \]
+Indeed,
+\begin{align*}
+	\GI^{(t)} &= \E_{\substack{\text{choices of pinnings} \\ \text{up to time $t$}}} \E_{i,j \sim [n]} H(X_i^{(t)}) - H(X_i^{(t)} \mid X_j^{(t)}) \\
+		&= \E_{\substack{\text{choices of pinnings} \\ \text{up to time $t$}}} \E_{i \sim [n]} H(X_i^{(t)}) - \E_{\substack{\text{choices of pinnings} \\ \text{up to time $t$}}} \E_{\substack{j \sim [n] \\ a_j \sim \mu_{\{j\}}^{(t)}}} \E_{i \sim [n]} H(X_i^{(t)} \mid X_j^{(t)} = a_j).
+\end{align*}
+The first quantity is equal to $\psi^{(t)}$ by definition. Furthermore, note that the second expectation in the second quantity exactly describes the pinning in the $(t+1)$th step! Therefore,
+\[
+\GI^{(t)} = \E_{\substack{\text{choices of pinnings} \\ \text{up to time $t$}}} \E_{i \sim [n]} H(X_i^{(t)}) - \E_{\substack{\text{choices of pinnings} \\ \text{up to time $t+1$}}} \E_{i \sim [n]} H(X_i^{(t+1)}) = \psi^{(t)} - \psi^{(t+1)}.
+\]
+Now, due to the non-negativity of entropy, $\psi^{(T)} \ge 0$, and due to the boundedness of entropy, $\psi^{(0)} \le \log q$. It follows that
+\[ \sum_{0 \le t \le T} \GI^{(t)} \le \log q. \]
+Therefore,
+\begin{align*}
+	\frac{\log q}{T} &\ge \E_{\text{choices of pinnings}} \frac{1}{T} \sum_{0 \le t \le T} \E_{i,j \sim [n]} I( X_i^{(t)} ; X_j^{(t)} ) \\
+		&\ge \E_{\text{choices of pinnings}} \min_{0 \le t \le T} \E_{i,j \sim [n]} I( X_i^{(t)} ; X_j^{(t)} ) \\
+		&\stackrel{\eqref{eq:pinsker-ineq}}{\ge} 2 \cdot \E_{\text{choices of pinnings}} \min_{0 \le t \le T} \E_{i,j \sim [n]} \dtv{ \mu_{\{i,j\}}^{(t)} }{ \mu_{\{i\}}^{(t)} \otimes \mu_{\{j\}}^{(t)} }^2. \\
+		&\ge 2 \cdot \left( \E_{\text{choices of pinnings}} \min_{0 \le t \le T} \E_{i,j \sim [n]} \dtv{ \mu_{\{i,j\}}^{(t)} }{ \mu_{\{i\}}^{(t)} \otimes \mu_{\{j\}}^{(t)} } \right)^2,
+\end{align*}
+where the final inequality is Jensen's inequality applied twice.
+Recalling that $T = \Omega\left( \frac{\log q}{\eps^2} \right)$,
+\[ \E_{\text{choices of pinning}} \min_{0 \le t \le T} \E_{i,j \sim [n]} \dtv{ \mu_{\{i,j\}}^{(t)} }{ \mu_{\{i\}}^{(t)} \otimes \mu_{\{j\}}^{(t)} } \le O(\eps), \]
+so for the output distribution $\pE'$ with local distributions $(\mu'_S)$,
+\begin{align*}
+	\E_{\text{choices of pinning}} \E_{i,j \sim [n]} \dtv{ \mu'_{\{i,j\}} }{ \mu'_{\{i\}} \otimes \mu'_{\{j\}} } &\le \E_{\text{choices of pinning}} \max \left\{ \eps , \min_{0 \le t \le T} \E_{i,j \sim [n]} \dtv{ \mu_{\{i,j\}}^{(t)} }{ \mu_{\{i\}}^{(t)} \otimes \mu_{\{j\}}^{(t)} } \right\} \\
+		&\le \eps + \E_{\text{choices of pinning}} \min_{0 \le t \le T} \E_{i,j \sim [n]} \dtv{ \mu_{\{i,j\}}^{(t)} }{ \mu_{\{i\}}^{(t)} \otimes \mu_{\{j\}}^{(t)} } \\
+		&\le O(\eps).
+\end{align*}
+
+This completes the proof of \Cref{lem:global-corr-lem}, and thus \Cref{th:dense-csps}. \qed
+
+An interesting aspect to the above analysis is that it does \emph{not} show that $\GI^{(t)}$ is monotone. This is the reason for the strange form of \Cref{lem:global-corr-lem} -- aesthetically, a nicer algorithm would involve just outputting $\pE_{T}$.
+
+\section{Beyond dense $2$-CSPs}
+
+The above algorithmic idea, while explained in the context of dense $2$-CSPs, goes far beyond. For starters, a similar analysis works for dense $k$-CSPs, which involves functions $\phi_{i_1,\ldots,i_k} : [q]^k \to \{0,1\}$. Here, there exists an algorithm that outputs an assignment $x$ with
+\[ \sum \phi_{i_1,\ldots,i_k}(x_1,\ldots,x_k) \ge \OPT - \eps n^k \]
+that runs in time $n^{\poly(\log q,1/\eps,k)}$.\\
+
+In fact, the ideas here also work for some important classes of non-dense $2$-CSPs. An important family of such CSPs is given by expanders. Recall that a graph $G$ with adjacency matrix $A_G$ and diagonal degree matrix $D$ is said to be a \emph{two-sided spectral expander} if the normalized adjacency matrix $D^{-1/2} A_G D^{-1/2}$, which has eigenvalues $(\lambda_i)_{i \in [n]}$ in $[-1,1]$ and top eigenvalue equal to $1$, is such that $|\lambda_i| \le \eps^{O(1)}$ for $2 \le i \le n$.\\
+Consider a CSP supported on such a graph, in that $\phi_{ij} \equiv 0$ if $ij$ is not an edge. For such graphs, it turns out the algorithm discussed here outputs an assignment $x$ such that
+\[ \sum_{ij \in G} \phi_{ij}(x_i,x_j) \ge \OPT - \eps |E(G)|. \]
+
+The situation is even more general. Suppose that $G$ is a graph whose normalized adjacency matrix, with eigenvalues $(\lambda_i)_{i \in [n]}$, is such that there are at most $r$ eigenvalues with $|\lambda_i| \ge \eps^{O(1)}$. Then, a similar algorithm outputs $x$ such that
+\[ \sum_{ij \in G} \phi_{ij}(x_i,x_j) \ge \OPT - \eps |E(G)|, \]
+running in time $n^{\poly(\log q,1/\eps,r)}$. This quantity $r$ is sometimes called the ``threshold rank'' of $G$, and much effort has been spent trying to show that low-threshold rank graphs behave like dense graphs in various senses. While the details of this analysis are largely similar those we have presented, we omit them as their explanation would require a detour into spectral graph theory -- we refer the interested reader to 
 
 \bibliographystyle{alpha}
 \bibliography{refs}
