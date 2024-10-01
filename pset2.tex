@@ -29,6 +29,7 @@
 
 % Theorem environments
 \newtheorem{theorem}{Theorem}
+\newtheorem*{theorem*}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
@@ -48,6 +49,7 @@
 \newcommand{\iprod}[1]{\langle #1 \rangle}
 \newcommand{\abs}[1]{\left| #1 \right|}
 \newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\poly}{\mathrm{poly}}
 
 % Macros for real and natural numbers
 \newcommand{\R}{\mathbb{R}} % Real numbers
@@ -67,9 +69,10 @@
 % Macros for probability
 \DeclareMathOperator{\E}{\mathbb{E}} % Expectation
 \DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+\newcommand{\Var}{\mathbf{Var}}
 
 % Macros for optimization
-\newcommand{\OPT}{\text{OPT}}
+\newcommand{\OPT}{\mathsf{OPT}}
 \newcommand{\SoS}{\text{SoS}}
 
 % Macro for indicator function
@@ -111,7 +114,30 @@ Because it implies $y = \frac{z^2}{x^2+1}$, any solution $(x,y,z)$ to the above 
 
 
 \begin{problem}
-  Unreleased.
+  In class, we saw how Gaussian rounding and global correlation could be used to approximate the max-cut of a graph. In this exercise, we will see how similar ideas can be used for \emph{max-bisection}. Let $G = (V,E)$ be a graph with $|V|=n$ even. The goal in the max-bisection problem is to determine
+  \[ \OPT = \max_{\substack{S \subseteq V \\ |S| = n/2}} E(S,\overline{S}), \]
+  where $E(S,\overline{S})$ is the size of the cut corresponding to $S$, that is, the number of edges between $S$ and $\overline{S}$. The goal in this exercise will be to prove the following theorem.
+
+  \begin{theorem*}
+    Let $G$ be a regular graph with max-bisection value at least $(1-\eps) |E|$. There exists an algorithm running in time $n^{(1/\eps)^{O(1)}}$ that outputs a bisection cutting $(1-O(\sqrt{\eps})) |E|$ edges.
+  \end{theorem*}
+
+  Let $\pE$ be a pseudodistribution over $\{\pm 1\}^n$ such that
+  \[ \pE \vDash \left\{ \frac{1}{4} \sum_{ij \in E} (y_i-y_j)^2 \ge 1 - \kappa , \sum y_i = 0 \right\}. \]
+
+  \begin{enumerate}
+    % \setcounter{enumi}{1}
+    \item Suppose we apply Gaussian rounding to $\pE$ to produce a random vector $z \in \{\pm 1\}^n$. Show that if the global information of $\pE$ is at most $\delta$, then $\Var \left(\sum z_i\right) \le \delta^{\Omega(1)} \cdot n^2$. (For a harder (optional) exercise, try improving this to $O(n)$.)
+
+    \item For $\delta > 0$, explain how to round $\pE$ of degree $\poly(1/\delta)$ to a distribution $z$ over $\{\pm 1\}^n$ such that
+    \[ \frac{1}{4} \E (z_i - z_j)^2 \ge 1 - \sqrt{\kappa} \]
+    and
+    \[ \Var \left( \sum z_i \right) \le \delta n^2. \]
+
+    \item Using the above, design a (randomized) algorithm running in time $n^{(1/\eps)^{O(1)}}$ that outputs $z \in \{\pm 1\}^n$ such that $\sum z_i = 0$ and
+    \[ \frac{1}{4} \sum_{ij \in E} (z_i - z_j)^2 \ge (1-O(\sqrt{\eps})) |E|. \]
+    Conclude that you have proved the theorem.
+  \end{enumerate}
 \end{problem}
 
 \begin{bproblem}[Integrality gaps for max-cut, borrowed from Pravesh Kothari]
