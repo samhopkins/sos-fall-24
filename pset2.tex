@@ -123,14 +123,14 @@ Because it implies $y = \frac{z^2}{x^2+1}$, any solution $(x,y,z)$ to the above 
   \end{theorem*}
 
   Let $\pE$ be a pseudodistribution over $\{\pm 1\}^n$ such that
-  \[ \pE \vDash \left\{ \frac{1}{4} \sum_{ij \in E} (y_i-y_j)^2 \ge 1 - \kappa , \sum y_i = 0 \right\}. \]
+  \[ \pE \vDash \left\{ \frac{1}{4} \sum_{ij \in E} (y_i-y_j)^2 \ge (1 - \kappa) |E| , \sum y_i = 0 \right\}. \]
 
   \begin{enumerate}
     % \setcounter{enumi}{1}
-    \item Suppose we apply Gaussian rounding to $\pE$ to produce a random vector $z \in \{\pm 1\}^n$. Show that if the global information of $\pE$ is at most $\delta$, then $\Var \left(\sum z_i\right) \le \delta^{\Omega(1)} \cdot n^2$. (For a harder (optional) exercise, try improving this to $O(n)$.)
+    \item Suppose we apply Gaussian rounding to $\pE$ to produce a random vector $z \in \{\pm 1\}^n$. Show that if the global information of $\pE$ is at most $\delta$, then $\Var \left(\sum z_i\right) \le \delta^{\Omega(1)} \cdot n^2$.
 
-    \item For $\delta > 0$, explain how to round $\pE$ of degree $\poly(1/\delta)$ to a distribution $z$ over $\{\pm 1\}^n$ such that
-    \[ \frac{1}{4} \E (z_i - z_j)^2 \ge 1 - \sqrt{\kappa} \]
+    \item For $\delta > 0$, explain how to round $\pE$ of degree $\poly(1/\delta)$ sufficiently large to a distribution $z$ over $\{\pm 1\}^n$ such that
+    \[ \frac{1}{4} \E \sum_{ij \in E} (z_i - z_j)^2 \ge (1 - \sqrt{\kappa})|E| \]
     and
     \[ \Var \left( \sum z_i \right) \le \delta n^2. \]
 
