@@ -130,7 +130,7 @@ Because it implies $y = \frac{z^2}{x^2+1}$, any solution $(x,y,z)$ to the above 
     \item Suppose we apply Gaussian rounding to $\pE$ to produce a random vector $z \in \{\pm 1\}^n$. Show that if the global information of $\pE$ is at most $\delta$, then $\Var \left(\sum z_i\right) \le \delta^{\Omega(1)} \cdot n^2$.
 
     \item For $\delta > 0$, explain how to round $\pE$ of degree $\poly(1/\delta)$ sufficiently large to a distribution $z$ over $\{\pm 1\}^n$ such that
-    \[ \frac{1}{4} \E \sum_{ij \in E} (z_i - z_j)^2 \ge (1 - \sqrt{\kappa})|E| \]
+    \[ \frac{1}{4} \E \sum_{ij \in E} (z_i - z_j)^2 \ge (1 - O(\sqrt{\kappa}))|E| \]
     and
     \[ \Var \left( \sum z_i \right) \le \delta n^2. \]
 
