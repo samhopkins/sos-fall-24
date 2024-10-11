@@ -112,7 +112,7 @@ Because it implies $y = \frac{z^2}{x^2+1}$, any solution $(x,y,z)$ to the above 
   Show that if $p$ has even degree, for every $q$ such that the degree of $pq$ is at most $d$, we have $\pE pq = 0$. Similarly, show that if $p$ has odd degree, for every $q$ such that the degree of $pq$ is at most $d-1$, we have $\pE pq = 0$.
 \end{problem}
 
-
+% \textcolor{red}{This problem is incorrect. Gaussian rounding does not work, because $\sum z_i$ is not $0$ in expectation. The correct algorithm does something fancier by thresholding the Gaussian more carefully (instead of just based on sign) to return a vector that is balanced in expectation. The difficulty is then showing that the variance is small, which requires a more involved argument than the usual GW one.}
 \begin{problem}
   In class, we saw how Gaussian rounding and global correlation could be used to approximate the max-cut of a graph. In this exercise, we will see how similar ideas can be used for \emph{max-bisection}. Let $G = (V,E)$ be a graph with $|V|=n$ even. The goal in the max-bisection problem is to determine
   \[ \OPT = \max_{\substack{S \subseteq V \\ |S| = n/2}} E(S,\overline{S}), \]
