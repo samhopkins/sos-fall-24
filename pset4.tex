@@ -1,0 +1,144 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{bproblem}[theorem]{Bonus Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\poly}{\mathrm{poly}}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\Id}{\mathrm{Id}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+\newcommand{\Var}{\mathbf{Var}}
+
+% Macros for optimization
+\newcommand{\OPT}{\mathsf{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+
+% Title and author information
+\title{Problem Set 2}
+\author{Samuel B. Hopkins}
+\date{Last updated \today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+Due: 11/??, 11:59pm.
+
+Please typeset your solutions in LaTeX.
+
+\begin{problem}[Sparse robust mean estimation]
+
+  In this problem, we will solve a sparse version of robust mean estimation.  Let $\mu \in \R^d$ be an unknown $k$-sparse vector, in that only $k$ of its entries are non-zero.  First $n = \widetilde{\Omega}(k^2 (\log d)/\epsilon^2)$ samples $v_1, \dots, v_n \in \R^d$ are drawn from $\mathcal{N}(\mu, \Id)$. Then an adversary alters $\epsilon n$ of the samples and reorders them arbitrarily.  We observe the resulting dataset $v_1', \dots , v_n'$.   Our goal will be to give an algorithm for estimating $\mu$ from these samples.
+
+  \begin{enumerate}[label=(\alph*)]
+    \item Let $\overline{v} = \frac{1}{n} \sum_{i = 1}^n v_i$.  Prove that with $0.99$ probability, for all $k$-sparse vectors $u \in \R^d$ with $\| u \| = 1$,
+    \[
+    \langle u, \overline{v} - \mu \rangle^2 \leq \epsilon^2 \,.  
+    \]
+    \item Define $\Sigma = \frac{1}{n} \sum_{i = 1}^n (v_i - \overline{v}) (v_i - \overline{v})^T$. 
+     Prove that with $0.99$ probability, $|\Sigma_{ij}| \leq 1/k$ for $i \neq j$ and $| \Sigma_{ii} - 1| \leq 1/k$ for all $i,j \in [d]$.
+    \item Consider the following system, which we call $\mathcal{S}$, with scalar variables $w_1, \dots , w_n$ and $d$-dimensional variables $z, z_1, \dots ,  z_n$
+    \[
+    \begin{split}
+    &w_i^2 = w_i \\
+    & \sum_{i = 1}^n w_i \geq (1 - \epsilon) n \\
+    &w_i(z_i - v_i') = 0 \\
+    &\overline{z} =  \frac{1}{n} \sum_{i = 1}^n z_i \; , \; \Sigma = \frac{1}{n} \sum_{i = 1}^n (z_i - \overline{z}) (z_i - \overline{z})^T \\ 
+    &-\frac{1}{k} \leq \Sigma_{ij} \leq \frac{1}{k}  \;\;\;\; \text{ for all } i \neq j  \\
+    &-\frac{1}{k} \leq \Sigma_{ii} - 1 \leq \frac{1}{k} \;\;\;\; \text{ for all } i
+    \end{split}
+    \]
+    Prove that with $0.99$ probability, there is a feasible solution to this system where the $w_i$ are indicators of the clean samples and the $z_i$ are the actual clean samples.
+    \\\\
+    From now on, assume that the events in (a), (b), (c) hold.
+    \item Now we consider the SoS relaxation of the system $\mathcal{S}$.  Let $u \in \R^d$ be an arbitrary $k$-sparse vector with $\| u \| = 1$.  Prove that 
+    \[
+    \mathcal{S} \vdash_2 \sum_{i = 1}^n \langle u, z_i - v_i \rangle^2  \leq 10 n (1 + \langle u, \overline{z} - \mu \rangle^2  )
+    \]
+    where recall $v_i$ are the clean samples drawn from $N(\mu, I)$.    
+    \item Let $u \in \R^d$ be an arbitrary $k$-sparse vector with $\| u \| = 1$.  Use part (c) to prove that 
+    \[
+    \mathcal{S} \vdash_4 \langle u, \overline{z} - \overline{v} \rangle^2 \leq   100 \epsilon  (1 + \langle u, \overline{z} - \mu \rangle^2  )
+    \]
+    \item Use part (e) to deduce that 
+    \[
+    \mathcal{S} \vdash_4 \langle u, \overline{z} - \mu \rangle^2 \leq O(\epsilon) \,.
+    \]
+    Put everything together to show that there is a polynomial time algorithm that takes the samples $v_1', \dots , v_n'$ and with probability $0.9$, outputs a $k$-sparse $\widehat{\mu}$ such that $\| \mu - \widehat{\mu} \| \leq O(\sqrt{\epsilon})$.
+  \end{enumerate}
+
+\end{problem}
+
+\begin{problem}
+  \textcolor{red}{Unreleased.}
+\end{problem}
+
+\end{document}
