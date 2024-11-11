@@ -1,0 +1,189 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem*{lemma*}{Lemma}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+
+% Macros for optimization
+\newcommand{\OPT}{\text{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+
+% Title and author information
+\title{Problem Set 1 -- Solutions}
+\author{Samuel B. Hopkins}
+\date{\today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+\begin{problem}[On $\vDash$, borrowed from Aaron Potechin]
+
+  Consider the following polynomial equation in $3$ variables, $x,y,z$.
+  \[ (x^2 + 1) y = z^2. \]
+  Because it implies $y = \frac{z^2}{x^2+1}$, any solution $(x,y,z)$ to the above must have $y \ge 0$. We will see if sum-of-squares can capture this reasoning.
+
+  \begin{enumerate}
+    \item Construct a degree $4$ pseudoexpectation $\pE$ in variables $x,y,z$ such that $\pE \vDash (x^2+1)y = z^2$ but $\pE y < 0$. (Computer-aided proofs are allowed.)
+
+    By $\pE \vDash (x^2+1)y = z^2$, we mean that for any polynomial $p$ of degree at most $1$ in $x,y,z$, $\pE p(x,y,z)(x^2+1)y = \pE p(x,y,z)z^2$.
+
+    \item Despite the above, show that there exists a sum-of-squares refutation to the following system of polynomial inequalities, for any $c > 0$: $\{ (x^2+1)y = z^2 , y \le -c \}$.
+  \end{enumerate}
+\end{problem}
+
+
+\paragraph{Solution, Part 1} (courtesy of Mahbod Majid)
+
+  Recall that $\pE$ is a degree 4 pseudoexpectation in variables $x,y,z$ if and only if
+  \[ \pE \brac{(1, x, y, z, xy, yz, xz, x^2, y^2, z^2)(1, x, y, z, xy, yz, xz, x^2, y^2, z^2)^T} \succcurlyeq 0. \]
+  Therefore, we wish to find a pseudoexpectation $\pE$ satisfying the following constraints.
+  \begin{align*}
+      &\pE \brac{(1, x, y, z, xy, yz, xz, x^2, y^2, z^2)(1, x, y, z, xy, yz, xz, x^2, y^2, z^2)^T} \succcurlyeq 0\\
+      &\pE \brac{x^2 y - z^2} = -\pE\brac{y} \\
+      &\pE \brac{x^3 y - xz^2} = -\pE\brac{xy} \\
+      &\pE \brac{x^2 y^2 - z^2y} = -\pE\brac{y^2} \\
+      &\pE \brac{x^2 y z - z^3} = -\pE\brac{yz} \\
+      &\pE \brac{y} < 0
+  \end{align*}
+
+  Such a pseudoexpectation may be constructed as follows.
+
+  \[
+  \begin{array}{c|cccccccccc}
+   & 1 & x & y & z & xy & yz & zx & x^2 & y^2 & z^2 \\
+  \hline
+  1 & 1 & 0 & -0.5 & 0 & 0 & 0 & 0 & 1.5 & 1 & 0.5 \\
+  x & 0 & 1.5 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  y & -0.5 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0.25 & 1.75 \\
+  z & 0 & 0 & 0 & 0.5 & 0 & 1.75 & 0 & 0 & 0 & 0 \\
+  xy & 0 & 1 & 0 & 0 & 0.75 & 0 & 0 & 0 & 0 & 0 \\
+  yz & 0 & 0 & 0 & 1.75 & 0 & 8.25 & 0 & 0 & 0 & 0 \\
+  zx & 0 & 0 & 0 & 0 & 0 & 0 & 4.75 & 0 & 0 & 0 \\
+  x^2 & 1.5 & 0 & 1 & 0 & 0 & 0 & 0 & 10 & 0.75 & 4.75 \\
+  y^2 & 1 & 0 & 0.25 & 0 & 0 & 0 & 0 & 0.75 & 10 & 8.25 \\
+  z^2 & 0.5 & 0 & 1.75 & 0 & 0 & 0 & 0 & 4.75 & 8.25 & 10
+  \end{array}
+  \]
+
+\paragraph{Solution, Part 2} (courtesy of Mahbod Majid)
+
+Indeed, for the given family of polynomials $\mathcal{A}$,
+we have that 
+\begin{align*}
+\cal{A}
+&\vdash_{4}
+(x^2 + 1)y \le -c (x^2 + 1)  \\
+\cal{A}
+&\vdash_{4}
+z^2 \le -c (x^2 + 1)  \\
+\cal{A}
+&\vdash_{4}
+0 \le -c (x^2 + 1) \\
+\cal{A}
+&\vdash_{4}
+cx^2 \le -c \\
+\cal{A}
+&\vdash_{4}
+0 \le -c \\
+\cal{A}
+&\vdash_{4}
+0 \le -1 
+\end{align*}
+as desired.
+
+
+\newpage
+
+\begin{problem}
+  Suppose $\pE$ is a pseudoexpectation of degree $d$, with $d$ even, and $\pE \vDash p \leq 0, p \geq 0$ for some polynomial $p$. (Informally, we have been writing $\pE \vDash p = 0$.)
+  Show that if $p$ has even degree, for every $q$ such that the degree of $pq$ is at most $d$, we have $\pE pq = 0$. Similarly, show that if $p$ has odd degree, for every $q$ such that the degree of $pq$ is at most $d-1$, we have $\pE pq = 0$.
+\end{problem}
+
+\paragraph{Solution}
+
+By definition, we have that $\pE pq = 0$ for every sum-of-squares polynomial $q$ such that the degree of $pq$ is at most $d$. Given an arbitrary polynomial $q$, we may write it in terms of its Fourier expansion as a sum of monomials $q = \sum \widehat{q}_\alpha x^\alpha$, in which case it suffices to show that $\pE p x^\alpha = 0$ for every bounded-degree monomial $x^\alpha$.
+
+Thus, let $q = x^\alpha$ and $\deg(q) = k \le d$. Then, $q$ may be written as the difference of two sum-of-squares polynomials, each of degree at most $\left\lfloor \frac{k+1}{2}\right\rfloor$. Indeed, we may write $x^\alpha = x^\beta x^\gamma$ for $\beta,\gamma$ each being the indicators on an arbitrary partition of the nonzero indices of $\alpha$ (of which there are at most $k$) into two sets of size at most $\left\lfloor \frac{k+1}{2}\right\rfloor$. Then,
+\[ x^\alpha = \left( \frac{x^\beta + x^\gamma}{2} \right)^2 - \left( \frac{x^\beta - x^\gamma}{2} \right)^2. \]
+Note that each of the polynomials inside the squares is of degree $\left \lfloor \frac{k+1}{2} \right \rfloor$. If $p$ has even degree, the degree of $p \cdot \left( \frac{x^\beta + x^\gamma}{2} \right)^2$ is at most $d$ if $\deg (p q) \le d$. If $\deg(p)$ is odd on the other hand, the degree of $p \cdot \left( \frac{x^\beta + x^\gamma}{2} \right)^2$ is equal to $\deg(pq) + 1$, which is at most $d$ if $\deg(p q) \le d-1$.
+
+The desideratum follows since for such monomials, $\pE \left[ p \cdot \left( \frac{x^\beta+x^\gamma}{2} \right)^2 \right] = \pE \left[ p \cdot \left( \frac{x^\beta-x^\gamma}{2} \right)^2 \right] = 0$ by the discussion in the first paragraph.
+
+% Let $q$ be a monomial of degree at most $d$ (for even $d$) or $d-1$ (for odd $d$). We will show that we can write $q$ as a difference of two sum of squares polynomials of degree at most $d$ (for even $d$) or $d-1$ (for odd $d$). Let $q = x^\alpha$, where $x^\alpha = x_1^{\alpha_1} \cdots x_n^{\alpha_n}$. Let $x^\alpha = x^\beta x^\gamma$ where $x^\beta, x^\gamma$ have degree at most $d/2$ (for even $d$) or $(d+1)/2$ (for odd $d$). Then we can write $x^{\alpha}$ as a difference of two squares as follows:
+
+% \begin{align*}
+% x^\alpha = \left( \frac{x^\beta + x^\gamma}{2}\right)^2 - \left(\frac{x^\beta - x^\gamma}{2} \right)^2
+% \end{align*}
+
+% The first term is a sum of squares polynomial of degree at most $d$ (for even $d$) or $d-1$ (for odd $d$), and the second term is a sum of squares polynomial of degree at most $d$ (for even $d$) or $d-1$ (for odd $d$). This completes the proof.
+
+\end{document}
