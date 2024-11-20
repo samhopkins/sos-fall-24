@@ -79,9 +79,11 @@
 
 % Macro for indicator function
 \newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+\newcommand{\wh}[1]{\widehat{#1}}
+\newcommand{\ER}{\mathsf{G}}
 
 % Title and author information
-\title{Problem Set 2}
+\title{Problem Set 4}
 \author{Samuel B. Hopkins}
 \date{Last updated \today}
 
@@ -138,7 +140,18 @@ Please typeset your solutions in LaTeX.
 \end{problem}
 
 \begin{problem}
-  \textcolor{red}{Unreleased.}
+  Recall the \emph{planted clique} problem, with the ``null distribution'' $\mathcal{N} = G(n,1/2)$, and the ``planted distribution'' $\mathcal{P}$ obtained by drawing $G$ from $G(n,1/2)$, and adding a uniformly random $k$-clique. It is believed that for $k$ significantly smaller than $O(\sqrt{n})$ (say $O(n^{1/2 - \eps})$), it is computationally hard to distinguish these two distributions. In this question, we will establish this computational hardness for the restricted class of algorithms based on low-degree polynomials.
+
+  Concretely, set $k = O(n^{1/2 - \eps})$ for some (small) constant $\eps > 0$, and $D \le C \log n$ for some (large) constant $C > 0$. Recall the degree-$D$ $\chi^2$-divergence, defined by
+  \[ \sqrt{ \chi^2_{\le D}\left( \mathcal{P} \| \mathcal{N} \right) } = \max_{\substack{F : \{ \text{set of graphs on $n$ vertices} \} \to \R \\ F \text{ degree $\le D$ polynomial} \\ F \text{ not identically $0$}}} \frac{ \E_{\mathcal{P}}[F] - \E_{\mathcal{N}}[F] }{\sqrt{\Var_{\mathcal{N}}[F]}}. \]
+  Further recall that this maximum is attained by the function $\left( \frac{\mathcal{P}}{\mathcal{N}} \right)^{\le D}$, where $\frac{\mathcal{P}}{\mathcal{N}}$ is the likelihood ratio $\frac{\mathcal{P}}{\mathcal{N}}(G) = \frac{\mathcal{P}(G)}{\mathcal{N}(G)}$ and the notation $f^{\le D}$ denotes the projection of $f$ to the space of degree $D$ polynomials. This resulting maximum is equal to
+  \[ \chi^2_{\le D} \left( \mathcal{P} \| \mathcal{N} \right) = \left\| \left( \frac{\mathcal{P}}{\mathcal{N}} \right)^{\le D} - 1 \right\|_2^2, \]
+  with the notation $\|f\|_2^2 = \E_{\mathcal{N}} f^2$.
+
+  \begin{enumerate}[label=(\alph*)]
+    \item Let $g = \left( \frac{\mathcal{P}}{\mathcal{N}} \right)^{\le D}$ be a polynomial of degree $D$ in the variables $(x_e)_{e \in \binom{[n]}{2}}$, where $x_e = 1$ if $e$ is an edge in the graph, and $-1$ otherwise. Express $g$ in terms of its Fourier coefficients as $g = \sum_{\alpha : |\alpha| \le D} \wh{g}_{\alpha} x^\alpha$. Determine $\wh{g}_\alpha$.
+    \item Show that in the given parameter regime of $k,D$, $\chi^2_{\le D}\left( \mathcal{P} \| \mathcal{N} \right) = \|g - 1\|^2 = o(1)$.
+  \end{enumerate}
 \end{problem}
 
 \end{document}
