@@ -1,0 +1,342 @@
+\documentclass[11pt, letterpaper]{article}
+
+\usepackage{planted}
+\usepackage{verbatim}
+\usepackage{tcolorbox}
+
+
+\newcommand{\Null}{\calN}
+\newcommand{\Planted}{\calP}
+\newcommand{\LR}{\textsf{LR}}
+
+
+% changing the following can be used to toggle author notes between on and off
+\def\authornotes{1pt}
+
+\ifdim\authornotes=1pt
+    \newcommand{\snote}[1]{\footnote{\color{red}Sidhanth: #1}}
+\else
+    \newcommand{\snote}[1]{}
+\fi
+
+\begin{document}
+
+\title{Notes on low-degree likelihood ratio tests}
+\author{Sidhanth Mohanty}
+\date{\today}
+\maketitle
+
+
+\section{Prelude: information-computation gaps}
+Let's start by discussing a few algorithmic problems that have given us a very useful lens into algorithms \& complexity in the average case.
+
+\medskip
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+\parhead{Planted $k$-XOR \emph{aka sparse $\F_2$ linear equations}.}
+In this problem, $\bx\sim\{\pm1\}^n$ is a \emph{hidden signal}.
+We are given $m$ clauses $(\bS_1,\by_1),\dots,(\bS_m,\by_m)$ where for each $i\in[m]$:
+\begin{align*}
+    (\bS_i,\by_i):~ & \bS\text{ uniform size-$k$ subset of }[n] \\
+        & \by\coloneqq
+        \begin{cases}
+            \prod_{i\in\bS} \bx_i & \text{with probability }1-\eps \\
+            \text{uniform $\pm1$ bit} &\text{with probability }\eps
+        \end{cases}
+\end{align*}
+
+\parhead{Algorithmic task.}
+Given $((\bS_i,\by_i))_{1\le i\le m}$, recover $\bx$.
+
+\parhead{State of affairs.}
+Information theoretic recovery of $\bx$ known when $m = \Omega(n)$.
+Efficient algorithms to recover $\bx$ known when $m = \Omega\parens*{n^{k/2}}$.
+
+\end{tcolorbox}
+
+\medskip
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+\parhead{Planted clique in random graph.}
+$\bx$ is a random $k$-sparse vector in $\{0,1\}^n$ is a hidden signal \text{aka planted clique}.
+We are given a graph $\bG$ where:
+\begin{align*}
+    \{i,j\}\text{ edge when }\bx_i\bx_j = 1 \\
+    \{i,j\}\text{ edge with probability }\frac{1}{2}\text{ when }\bx_i\bx_j = 0
+\end{align*}
+
+\parhead{Algorithmic task.}
+Given $\bG$, recover the planted clique $\bx$.
+
+\parhead{State of affairs.}
+Information theoretic recovery of $\bx$ known when $k = \Omega(\log n)$.
+Efficient algorithms to recover $\bx$ known when $k = \Omega(\sqrt{n})$.
+
+\end{tcolorbox}
+
+\medskip
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+
+\parhead{Planted Boolean Vector.}
+$\bx\sim\{\pm1\}^n$ is the hidden signal.
+We are given a uniformly random $d$-dimensional subspace $\bV$ of $\R^n$ conditioned on (approximately) containing $\bx$.
+
+\parhead{Algorithmic task.}
+Given $\bV$, recover the planted Boolean vector $\bx$.
+
+\parhead{State of affairs.}
+Information theoretic recovery of $\bx$ known when $d \le n-1$.
+Efficient algorithms for recover known when $d = O(\sqrt{n})$.
+
+\end{tcolorbox}
+
+\noindent Our main motivating question is:
+\begin{question}
+    \emph{How can we obtain rigorous evidence for the hardness in the regime where information-theoretic algorithms exist but no efficient algorithms are known?}
+\end{question}
+
+\section{On proving hardness for average-case problems}
+In statistics, the inputs to problems are very structured, often comprising of \emph{independent} samples, or graphs and matrices where entries enjoy a lot of independence.
+However, as we saw above, despite this nice structure, several algorithmic problems of interest are nevertheless seemingly hard.
+The theory of NP-hardness fails to articulate why such problems are hard, since reductions from known hard problems do not give such nice structured instances.
+
+Two popular approaches to support that a problem is hard are:
+\begin{enumerate}
+    \item {\bf Hardness against restricted models.}
+    For example, lower bounds against \emph{convex programming hierarchies} like \emph{Sum-of-Squares}, \emph{low-degree polynomials}, \emph{message passing algorithms}, \emph{statistical query models}, \emph{local algorithms}, etc.
+    \item {\bf Average-case reductions.}
+    Instead of starting with an assumption like $P\ne NP$, start with an assumption like ``Planted Clique is hard when $k \ll \sqrt{n}$'', or ``Planted $k$XOR is hard when $m = 100 n$''.
+\end{enumerate}
+In this lecture, we will focus on the first approach to proving hardness, focusing on a model for low-degree polynomial-based algorithms.
+
+% Open problems: do low-degree lower bounds translate to lower bounds against actual algorithms?
+% E.g. can we show polynomials fail to distinguish?
+% What about convex programs?
+
+\section{Problem set-up}
+Consider the following algorithmic problem, commonly known as \emph{distinguishing} or \emph{hypothesis testing}:
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+    \noindent {\bf Distinguishing/hypothesis testing.}
+    Let $\Null$ (\emph{null distribution}) and $\Planted$ (\emph{planted distribution}) be two probability distributions.
+    Given $\bG$ drawn from either $\Null$ or $\Planted$, figure out whether the sample came from $\Null$ or $\Planted$.
+\end{tcolorbox}
+Think of the planted distribution $\Planted$ as akin to the distributions mentioned at the start of lecture, and think of the null distribution $\Null$ as being a version of the distribution with no hidden signal.
+Concretely:
+\begin{itemize}
+    \item In the \emph{planted clique} problem, the null distribution is an \erdos--\renyi graph $G(n,1/2)$ [every pair of vertices $ij$ is independently chosen as an edge with probability $1/2$].
+    \item In the \emph{planted $k$XOR} problem, in the null distribution, the $\by_i$ are all chosen as uniform $\pm1$ bits.
+    \item In the \emph{planted Boolean vector} problem, the null distribution is a uniformly random $d$-dimensional subspace of $\R^n$.
+\end{itemize}
+In many cases, an efficient algorithm to find the hidden signal can often be used as a distinguisher between the null and planted distributions.
+Thus, to articulate hardness of recovering the planted signal, we will give evidence of hardness for the corresponding hypothesis testing problem.
+
+\parhead{Information-theoretic indistinguishability.}
+Our model for impossibility to \emph{efficiently} solve some hypothesis testing problems is based on low-degree polynomials can be motivated by information-theoretic techniques.
+(This is with the privilege of hindsight --- the path to this model was a lot murkier than the story below.) 
+
+The distinguisher with the highest success probability that can tell $\Null$ and $\Planted$ apart is the following function.
+\begin{align*}
+    F(\bG) \coloneqq
+    \begin{cases}
+        \Null &\text{ when $\Null(\bG) > \Planted(\bG)$} \\
+        \Planted &\text{ otherwise.}
+    \end{cases}
+\end{align*}
+Concretely, this function maximizes $$\Pr_{\Null}[F(\bG) = \Null] - \Pr_{\Planted}[F(\bG) = \Null] = \Pr_{\Planted}[F(\bG) = \Planted] - \Pr_{\Null}[F(\bG) = \Planted],$$ whose the value is equal to the \emph{total variation distance}:
+\[
+    d_{\mathrm{TV}}(\Null,\Planted) \coloneqq \frac{1}{2}\E_{\bG\sim\Null}\bracks*{\abs*{ 1 - \frac{\Planted(\bG)}{\Null(\bG)} }}.
+\]
+When the TV distance between $\Null$ and $\Planted$ is tiny, it is not possible to reasonably tell these models apart from $\bG$.
+
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+    \begin{exercise}
+        Prove that the total variation distance is equal the maximum of the above objective.
+    \end{exercise}
+\end{tcolorbox}
+
+
+In the settings we are studying, the TV distance is close to $1$, but it nevertheless seems hard to tell these algorithms apart with an efficient algorithm.
+The issue is that the distinguishing function $F$ may not be efficiently computable.
+We would thus like to get a \emph{computational version} of TV distance, that articulates when efficient algorithms cannot tell two distributions apart.
+In particular, the goal is to get a handle on ``something like'':
+\[
+    \max_{\substack{F:\text{inputs} \to \{\Null,\Planted\} \\
+    F\text{ efficiently computable}}}
+    \Pr_{\Null}[F(\bG) = \Null] - \Pr_{\Planted}[F(\bG) = \Null].
+\]
+We would like to simplify the above expression for two reasons:
+\begin{enumerate}
+    \item Our understanding of the space of ``efficiently computable'' functions is at a hopeless state.
+    \item Even if we replaced ``efficiently computable'' with some nicer set, it is typically not analytically nice to try to maximize over Boolean functions.
+\end{enumerate}
+One also grapples with the second point while proving information-theoretic lower bounds.
+A relaxation of the TV distance is the \emph{chi-squared divergence}, denoted $\chi^2(\Planted\|\Null)$.
+\[
+    d_{\mathrm{TV}}(\Null,\Planted)^2 \coloneqq \frac{1}{4}\E_{\bG\sim\Null}\bracks*{\abs*{ 1 - \frac{\Planted(\bG)}{\Null(\bG)} }}^2 \le \frac{1}{4}{\E_{\bG\sim\Null}\bracks*{ \parens*{ 1 - \frac{\Planted(\bG)}{\Null(\bG)} }^2 } } =: \chi^2(\Planted\|\Null).
+\]
+In many scenarios, it is a much easier quantity to control analytically.
+An alternate ``variational'' form for the chi-squared divergence\footnote{Variational means it arises as the solution to some optimization problem.} is the following:
+\[
+    \sqrt{\chi^2(\Planted\|\Null)} = \max_{F:\text{inputs}\to\R, F\ne 0} \frac{\E_{\Planted} F - \E_{\Null} F}{\sqrt{\Var_{\Null} F}}
+\]
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+    \begin{exercise}
+        Prove the above variational formula for chi-squared divergence.
+        Show that the optimizer to the problem on the right is achieved by choosing $F(\bG)$ as $\frac{\Planted(\bG)}{\Null(\bG)} - 1$.
+    \end{exercise}
+\end{tcolorbox}
+The second relaxation that we make is to replace ``efficiently computable'' with an expressive class of functions that are also analytically nice to get a handle on --- low-degree polynomials!
+This motivates defining
+\[
+    \sqrt{\chi^2_{\le D}(\Planted\|\Null)} = \max_{\substack{F:\text{inputs}\to\R, F\ne 0 \\ F \text{ degree-}\le D\text{ polynomial}}} \frac{\E_{\Planted} F - \E_{\Null} F}{\sqrt{\Var_{\Null} F}} \numberthis \label{eq:low-degree}
+\]
+which we call the \emph{degree-}$D$\text{ chi-squared divergence}; this is more popularly known as the \emph{low-degree likelihood ratio} for reasons we will see soon.
+
+The hardness hypothesis surrounding the low-degree chi-squared divergence is that it is a good proxy for computational indistinguishability.
+Concretely, as first posited in \cite{HS17}:
+\begin{displayquote}
+    Suppose $\Null$ and $\Planted$ are sufficiently ``well-structured'' distributions over $\R^n$,\footnote{see \cite{Hop18} for a more precise formulation} and $\chi^2_D(\Planted\|\Null) = o_n(1)$, then there is no $n^{O(D/\log n)}$-time algorithm to distinguish $\Null$ from $\Planted$.
+\end{displayquote}
+
+\parhead{Power of the low-degree model.}
+The power of the low-degree model comes from the fact that it is quite easy to obtain a handle on $\chi^2_{\le D}(\Planted\|\Null)$ for many distributions of interest, and thus predict where the computational threshold lies.
+The predictions obtained from this method also accurately line up with when many of our algorithmic techniques fail for several problems of interest.
+
+It is possible to exactly characterize the function $F$ that achieves the maximum in the definition of the low-degree divergence from \Cref{eq:low-degree}, which enables explicitly bounding the divergence relatively painlessly.
+
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+\begin{theorem} \label{thm:low-degree-formula}
+\hypersetup{linkcolor=Fuchsia}
+The function $F$ achieving the maximum in {\Cref{eq:low-degree}} is given by:
+\[
+    F(\bG) = \parens*{ \frac{\Planted}{\Null} }^{\le D}(\bG) - 1 \qquad \sqrt{\chi^2_D(\Planted\|\Null)} = \norm*{ \parens*{ \frac{\Planted}{\Null} }^{\le D}(\bG) - 1 }_{\Null}
+\]
+Here, for a function $H$, the notation $H^{\le D}$ refers to its projection onto the subspace of degree-$\le D$ polynomials.
+The projection and norm $\|\cdot\|_{\Null}$ is under the inner product $\angles*{H_1,H_2}_{\Null} = \E_{\bG\sim\Null} H_1(\bG)\cdot H_2(\bG)$.
+\end{theorem}
+\hypersetup{linkcolor=RoyalBlue}
+\end{tcolorbox}
+
+We now derive the formula for $F$ and $\chi^2_D(\Planted\|\Null)$.
+
+\begin{proof}[Proof of \Cref{thm:low-degree-formula}]
+Observe that the objective in \Cref{eq:low-degree} is invariant to shifting and rescaling $F$, and thus, we can write our optimization problem as:
+\begin{align*}
+    \max_{\substack{F:\deg(F)\le D\\ \E_{\Null}F(\bG) = 0 \\ \E_{\Null}F(\bG)^2=1}} \E_{\Planted}F(\bx) &= \max_{\substack{F:\deg(F)\le D\\ \E_{\Null}F(\bG) = 0 \\ \E_{\Null}F(\bG)^2=1}} \E_{\Null}\left[F(\bG)\cdot\frac{\Planted(\bG)}{\Null(\bG)}\right] 
+\end{align*}
+Now we use the following general linear algebra fact:
+\begin{fact}    \label{fact:orth-proj-self-adj}
+Let $V$ be a subspace of an inner product space $\calH$, and let $\Pi_V$ be the orthogonal projection onto $V$.  $\Pi_V$ is self-adjoint, and consequently if $x\in V$ and $y\in\calH$, then
+\[
+\langle x, y\rangle_{\calH} = \langle \Pi_V x, y\rangle_{\calH} = \langle x, \Pi_V y\rangle_{\calH}.
+\]
+\end{fact}
+By setting $\calH$ as the space of (measurable) functions from $\R^d$ to $\R$ equipped with inner product
+\[
+    \langle f, g\rangle_{\Null} \coloneqq \E_{\bG\sim\Null}f(\bG)g(\bG)
+\]
+and $V$ as $\{F:\deg(F)\le D,~\E[F]=0\}$ and applying \Cref{fact:orth-proj-self-adj}, we get
+\begin{align*}
+    F^*_D &= \arg\max_{\substack{F\in V \\ \langle F(\bx),F(\bx)\rangle_{\Null}=1}} \left\langle F,\left(\frac{\Planted}{\Null}\right)^{\le D}-\E_{\bx\sim\Null}\frac{\Planted(\bx)}{\Null(\bx)}\right\rangle_{\Null}\\
+    &= \arg\max_{\substack{F\in V \\ \langle F(\bG),F(\bG)\rangle_{\Null}=1}} \left\langle F,\left(\frac{\Planted}{\Null}\right)^{\le D}-1\right\rangle_{\Null}\\
+    &= \frac{\left(\frac{\Planted}{\Null}\right)^{\le D}-1}{\left\|\left(\frac{\Planted}{\Null}\right)^{\le D}-1\right\|_{\Null}}.
+\end{align*}
+Finally,
+\[
+    \E_{\Planted}F^*_D(\bG) = \left\langle F^*_D, \frac{\Planted}{\Null}\right\rangle = \left\|\left(\frac{\Planted}{\Null}\right)^{\le D}-1\right\|_{\Null}.   \qedhere
+\]
+\end{proof}
+
+
+\section{Case of planted clique}
+{\bf Simple algorithm when $k \ge 10\sqrt{n\log n}$.}
+In $G(n,1/2)$, every vertex has degree $n/2\pm 5\sqrt{n\log n}$ with high probability.
+When $k\ge 10\sqrt{n\log n}$, all the clique vertices systematically have larger degree.
+Distinguisher can simply be based on the maximum degree vertex.
+Clique can be recovered by taking top-$k$ vertices, sorted in decreasing order of degree.
+
+There is a spectral algorithm to recover a clique of size $O(\sqrt{n})$ in polynomial time.
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+    \begin{exercise}
+        For every constant $\alpha > 0$, give an algorithm that runs in time $n^{O(\log\frac1\alpha)}$ to find the planted clique when $k\ge\alpha\sqrt{n}$.
+    \end{exercise}
+\end{tcolorbox}
+
+{\bf Intractability}
+We will now see how the low-degree method predicts the $\sqrt{n}$ threshold for planted clique.
+
+Let $\Null$ be $G(n,1/2)$ and $\Planted$ be the planted clique distribution with clique size $k$.
+Our goal in this section is to compute $\chi^2_D(\Planted\|\Null)$ for $D = O(1)$ as a function of $k$.
+Using $\LR(\bG)$ to denote $\frac{\Planted}{\Null}(\bG)$, and Parseval's identity from Fourier analysis:
+\[
+    \chi^2_D(\Planted\|\Null)^2 = \|\LR^{\le D} - 1\|_\Null^2 = \sum_{\alpha\subseteq {n\brack 2}} \langle \LR^{\le D} - 1, \chi_{\alpha} \rangle^2
+\]
+where $\chi_\alpha$ are the Fourier characters of functions from $\{\pm 1\}^{n\brack 2}$ to $\C$.
+
+Towards computing the Fourier coefficients, fix $\alpha\subseteq{n\brack 2}$.
+If $|\alpha|>D$, $\langle \LR^{\le D}, \chi_\alpha\rangle = 0$. And if $1\le|\alpha|\le D$, then
+\begin{align*}
+    \langle \LR^{\le D} - 1, \chi_\alpha\rangle
+    &= \langle \LR, \chi_{\alpha}\rangle\\
+    &= \E_{\Planted} \chi_{\alpha}(\bG)\\
+    &= \E_{\Planted} \prod_{\{i,j\}\in\alpha} \bG_{ij}\\
+    &= \Pr[\text{all vtcs touched by $\alpha$ in clique}]\cdot\E_{\Planted} \bracks*{\prod_{\{i,j\}\in\alpha} \bG_{ij}\mid\text{all vtcs touched by $\alpha$ in clique}} \\
+    &= \left(\frac{k}{n}\right)^{|V(\alpha)|}
+\end{align*}
+Thus:
+\begin{align*}
+    \chi^2_D(\Planted\|\Null)^2 &= \sum_{1\le |\alpha|\le D}\left(\frac{k}{n}\right)^{2|V(\alpha)|} \\
+    &\le \sum_{t\le 2D} 2^{t\choose 2} n^t \left(\frac{k}{n}\right)^{2t}\\
+    &\le C\left(\frac{k^2}{n}\right)^{2D}
+\end{align*}
+where $C = O(1)$ because $D = O(1)$.
+
+Observe that this is $o(1)$ whenever $k = o(\sqrt{n})$!
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+    \begin{exercise}
+        For $\Null = G(n,1/2)$ and $\Planted=G(n,1/2)+k\text{-clique}$, for $k = o(\sqrt{n})$ and $D = o(\log^2 n)$, prove that $\chi^2_D(\Planted\|\Null) = o_n(1)$. 
+    \end{exercise}
+\end{tcolorbox}
+
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+    \begin{exercise}
+        For $\Null = \text{random }k\text{XOR}$ and $\Planted=\text{planted }k\text{XOR}$ where number of variables is $n$ and number of constraints is $m$, and $k \ge 3$, prove that for $D = o\parens*{ \parens*{\frac{m}{n}}^{2/(k-1)} }$, prove that $\chi^2_D(\Planted\|\Null) = o_n(1)$. 
+    \end{exercise}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[arc=3mm,colback=White,coltext=Black,boxrule=1pt]
+    \begin{exercise}[{Hard}]
+        For $\Null = \text{random }d$-dimensional subspace of $\R^n$ and $\Planted=$planted Boolean vector distribution with same parameters, identify the $(n,d,D)$ choices for which $\chi^2_D(\Planted\|\Null) = o_n(1)$. 
+    \end{exercise}
+\end{tcolorbox}
+
+
+\section{Connections and broader discussion}
+Since the quantity $\chi^2_D(\Planted\|\Null)$ is quite easy to get a handle on and perform explicit calculations with for many choices of $\Null$ and $\Planted$, it is a very appealing predictor for computational thresholds.
+
+However, it is not known to imply lower bounds against any actual classes of algorithms.
+Here, we state a few problems of interest.
+\begin{itemize}
+    \item {\bf Lower bounds against low-degree algorithms.} Show that $\chi^2_D(\Planted\|\Null) = o_n(1)$ implies a lower bound against algorithms that: (1) evaluate a polynomial $p$ on the input $\bG$, (2) threshold on the value of $p(\bG)$ to output $\Planted$ or $\Null$.
+    \item {\bf Lower bounds against spectral algorithms.} Show that if $\chi^2_{\mathrm{poly}(D,\log n)}(\Planted\|\Null) = o_n(1)$, then for any $n^D\times n^D$ matrix $M(\bG)$ constructed by placing a degree-$D$ polynomial of $\bG$ in every entry of $M(\bG)$, $\mathrm{spectrum}(M(\bG))_{\bG\sim \Null}$ is ``close'' to $\mathrm{spectrum}(M(\bG))_{\bG\sim \Planted}$.
+    (A quantitatively strong version of this would imply lower bounds against the Sum-of-Squares hierarchy!)
+\end{itemize}
+
+% \begin{remark}
+%     It is common in the literature to refer to a bound on $\chi^2_D(\Planted\|\Null)$ as a \emph{lower bound against low-degree polynomials}.
+%     However, it doesn't actually preclude distinguishing algorithms that, say, evaluate a polynomial $p$ on the input $\bG$ and threshold on the output value.
+% \end{remark}
+
+Some highlights related to other models that low-degree lower bounds are related to.
+\begin{itemize}
+    \item A heuristic from statistical physics, called the cavity method, was used to obtain predictions for the algorithmic threshold for \emph{community detection} in \emph{stochastic block models} in \cite{DKMZ11}.
+    The paper where the low-degree divergence was introduced \cite{HS17} proved that the low-degree threshold for the block model matches the cavity method predictions.
+    \item Under fairly general conditions on $\Null$ and $\Planted$, the work of \cite{BBHLS20} proved that the low-degree threshold matches the threshold for the \emph{statistical query model}, a restrictive query model introduced in the context of learning theory.
+    \item For a class of $\Null$ and $\Planted$, ``Gaussian additive models'', the work of \cite{BEHSWZ22} showed that the low-degree threshold matches the one predicted by certain solution geometry-based techniques from statistical physics.
+    \item A similar theory was developed for \emph{estimation} problems in the work of Schramm \& Wein \cite{SW22}.
+\end{itemize}
+
+
+\bibliographystyle{alpha}
+\bibliography{main}
+
+\end{document}

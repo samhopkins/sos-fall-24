@@ -68,6 +68,7 @@
 % Macros for probability
 \DeclareMathOperator{\E}{\mathbb{E}} % Expectation
 \DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+\newcommand{\Var}{\mathbf{Var}}
 
 % Macros for optimization
 \newcommand{\OPT}{\text{OPT}}
@@ -77,6 +78,8 @@
 \newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
 \newcommand{\Id}{\mathrm{Id}}
 \newcommand{\indic}{\mathbf{1}}
+\newcommand{\wh}[1]{\widehat{#1}}
+\newcommand{\ER}{\mathsf{G}}
 
 % Title and author information
 \title{Problem Set 4 Solutions}
@@ -231,5 +234,38 @@
 \end{problem}
 
 \paragraph{Solution}
+
+\begin{enumerate}[label=(\alph*)]
+  \item By the definition of the Fourier coefficients (and the orthogonality of the associated polynomials),
+  \begin{align*}
+    \wh{g}_\alpha &= \left\langle \left(\frac{\mathcal{P}}{\mathcal{N}}\right)^{\le D} , x^\alpha \right\rangle_{\mathcal{N}} \\
+      &= \left\langle \left( \frac{\mathcal{P}}{\mathcal{N}} \right) , x^\alpha  \right\rangle_{\mathcal{N}} \\
+      &= \E_{\mathcal{P}} x^\alpha.
+  \end{align*}
+  Note that if some edge in $\alpha$ does not have both its endpoints in the planted clique, the expectation becomes $0$ as $x^\alpha$ is $\pm 1$ with probability $1/2$. Thus, this Fourier coefficient is
+  \begin{align*}
+    \wh{g}_\alpha &= \Pr\left[ \text{all of $V(\alpha)$ is touched by the clique} \right] \cdot \E_{\mathcal{P}} \left[\prod_{e \in \alpha} x_e \mid \text{all of $V(\alpha)$ is touched by the clique}\right] \\
+      &= \frac{\binom{n-|V(\alpha)|}{k-|V(\alpha)|}}{\binom{n}{k}}.
+  \end{align*}
+
+  \item We have
+  \begin{align*}
+    \chi^2_{\le D} \left( \mathcal{P} \| \mathcal{N} \right) &= \| g - 1 \|^2 \\
+      &= \sum_{\substack{|\alpha| \le D \\ \alpha \ne \emptyset}} \wh{g}_\alpha^2 \\
+      &= \sum_{\substack{|\alpha| \le D \\ \alpha \ne \emptyset}} \frac{\binom{n-|V(\alpha)|}{k-|V(\alpha)|}^2}{\binom{n}{k}^2} \\
+      &\le \sum_{\substack{|\alpha| \le D \\ \alpha \ne \emptyset}} \left( \frac{k}{n} \right)^{2|V(\alpha)|} \\
+      &\le \sum_{1 \le t \le 2D} n^t \cdot \left( \sum_{r \le D} \binom{ \binom{t}{2} }{ r } \right) \cdot \left( \frac{k}{n} \right)^{2t} \\
+      &\le \sum_{1 \le t \le 2D} \left( \sum_{r \le D} \binom{ \binom{t}{2} }{ r } \right) \cdot \left( \frac{k^2}{n} \right)^t.
+  \end{align*}
+  Here, the second-to-last line follows because there are at most $n^t$ ways to pick $V(\alpha)$ of size $t$, and at most $\left( \sum_{r \le D} \binom{ \binom{t}{2} }{ r } \right)$ ways to choose the edges of $\alpha$ (of size at most $D$) from within these vertices. This may be bounded by $\min\left\{2^{t^2} , t^{2D}\right\}$, which are good bounds for small $t$ and large $t$ respectively. That is, our goal is now to bound
+  \[ \sum_{1 \le t \le 2D} \min\left\{ 2^{t^2} , t^{2D} \right\} \cdot \left( \frac{k^2}{n} \right)^{t}. \]
+  Let us split this summation into two parts, using different bounds in each case. Setting $k = O(n^{1/2-\eps/2})$, we have
+  \[ \chi^2_{\le D}\left( \mathcal{P} \| \mathcal{N} \right) \le \sum_{1 \le t \le \frac{\eps}{2} \log n} 2^{t^2} \cdot n^{-\eps t} + \sum_{\frac{\eps}{2} \log n \le t \le C \log n} t^{2D} \cdot n^{-\eps t}. \]
+  Each summand of the first sum can be bounded by
+  \[ 2^{t^2} \cdot n^{-\eps t} \le 2^{t \cdot (\eps/2) \cdot \log n} \cdot n^{-\eps t} \le n^{-\eps t/2} = o(1/\log n), \]
+  so the first sum is $o(1)$. For each term of the second sum, we have
+  \[ t^{2D} \cdot n^{-\eps t} = e^{2D\log t - \eps t \log n}. \]
+  Note that because $\frac{\eps}{2} \log n \le t \le C \log n$, $D \log t = O(\log n \cdot \log \log n)$, while $t \log n = \Omega(\log^2 n)$. As a result, each term of this sum is also $o(1/\log n)$, and the second sum is $o(1)$, completing the proof.
+\end{enumerate}
 
 \end{document}
