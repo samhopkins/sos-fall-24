@@ -1,0 +1,235 @@
+\documentclass[11pt]{article}
+
+% Packages for math. MUST LOAD BEFORE FONT PACKAGES
+\usepackage{amsmath, amssymb, amsthm}
+
+
+% Set font to Palatino
+\usepackage{newpxmath}
+\usepackage{newpxtext}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\usepackage{enumitem}
+
+\usepackage{color}
+\usepackage{tcolorbox}
+
+
+
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+% Page margins
+\usepackage[margin=1in]{geometry}
+
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem*{question}{Question}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem*{lemma*}{Lemma}
+
+% Delimiter macros
+\newcommand{\paren}[1]{\left( #1 \right)}
+\newcommand{\brac}[1]{\left[ #1 \right]}
+\newcommand{\iprod}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+
+% Macros for real and natural numbers
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\eps}{\epsilon}
+
+% Alphabet
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cQ}{\mathcal{Q}}
+
+
+% Macros for probability
+\DeclareMathOperator{\E}{\mathbb{E}} % Expectation
+\DeclareMathOperator{\pE}{\widetilde{\mathbb{E}}} % Pseudoexpectation
+
+% Macros for optimization
+\newcommand{\OPT}{\text{OPT}}
+\newcommand{\SoS}{\text{SoS}}
+
+% Macro for indicator function
+\newcommand{\Ind}[1]{\mathbf{1}\left ( #1\right )}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\indic}{\mathbf{1}}
+
+% Title and author information
+\title{Problem Set 4 Solutions}
+\author{Samuel B. Hopkins}
+\date{\today}
+
+% Document starts here
+\begin{document}
+
+\maketitle
+
+\begin{problem}
+  In this problem, we will solve a sparse version of robust mean estimation.  Let $\mu \in \R^d$ be an unknown $k$-sparse vector, in that only $k$ of its entries are non-zero.  First $n = \widetilde{\Omega}(k^2 (\log d)/\epsilon^2)$ samples $v_1, \dots, v_n \in \R^d$ are drawn from $\mathcal{N}(\mu, \Id)$. Then an adversary alters $\epsilon n$ of the samples and reorders them arbitrarily.  We observe the resulting dataset $v_1', \dots , v_n'$.   Our goal will be to give an algorithm for estimating $\mu$ from these samples.
+
+  \begin{enumerate}[label=(\alph*)]
+    \item Let $\overline{v} = \frac{1}{n} \sum_{i = 1}^n v_i$.  Prove that with $0.99$ probability, for all $k$-sparse vectors $u \in \R^d$ with $\| u \| = 1$,
+    \[
+    \langle u, \overline{v} - \mu \rangle^2 \leq \epsilon^2 \,.  
+    \]
+    \item Define $\Sigma = \frac{1}{n} \sum_{i = 1}^n (v_i - \overline{v}) (v_i - \overline{v})^T$. 
+     Prove that with $0.99$ probability, $|\Sigma_{ij}| \leq 1/k$ for $i \neq j$ and $| \Sigma_{ii} - 1| \leq 1/k$ for all $i,j \in [d]$.
+    \item Consider the following system, which we call $\mathcal{S}$, with scalar variables $w_1, \dots , w_n$ and $d$-dimensional variables $z, z_1, \dots ,  z_n$
+    \[
+    \begin{split}
+    &w_i^2 = w_i \\
+    & \sum_{i = 1}^n w_i \geq (1 - \epsilon) n \\
+    &w_i(z_i - v_i') = 0 \\
+    &\overline{z} =  \frac{1}{n} \sum_{i = 1}^n z_i \; , \; \Sigma = \frac{1}{n} \sum_{i = 1}^n (z_i - \overline{z}) (z_i - \overline{z})^T \\ 
+    &-\frac{1}{k} \leq \Sigma_{ij} \leq \frac{1}{k}  \;\;\;\; \text{ for all } i \neq j  \\
+    &-\frac{1}{k} \leq \Sigma_{ii} - 1 \leq \frac{1}{k} \;\;\;\; \text{ for all } i
+    \end{split}
+    \]
+    Prove that with $0.99$ probability, there is a feasible solution to this system where the $w_i$ are indicators of the clean samples and the $z_i$ are the actual clean samples.
+    \\\\
+    From now on, assume that the events in (a), (b), (c) hold.
+    \item Now we consider the SoS relaxation of the system $\mathcal{S}$.  Let $u \in \R^d$ be an arbitrary $k$-sparse vector with $\| u \| = 1$.  Prove that 
+    \[
+    \mathcal{S} \vdash_2 \sum_{i = 1}^n \langle u, z_i - v_i \rangle^2  \leq 10 n (1 + \langle u, \overline{z} - \mu \rangle^2  )
+    \]
+    where recall $v_i$ are the clean samples drawn from $N(\mu, I)$.    
+    \item Let $u \in \R^d$ be an arbitrary $k$-sparse vector with $\| u \| = 1$.  Use part (c) to prove that 
+    \[
+    \mathcal{S} \vdash_4 \langle u, \overline{z} - \overline{v} \rangle^2 \leq   100 \epsilon  (1 + \langle u, \overline{z} - \mu \rangle^2  )
+    \]
+    \item Use part (e) to deduce that 
+    \[
+    \mathcal{S} \vdash_4 \langle u, \overline{z} - \mu \rangle^2 \leq O(\epsilon) \,.
+    \]
+    Put everything together to show that there is a polynomial time algorithm that takes the samples $v_1', \dots , v_n'$ and with probability $0.9$, outputs a $k$-sparse $\widehat{\mu}$ such that $\| \mu - \widehat{\mu} \| \leq O(\sqrt{\epsilon})$.
+  \end{enumerate}
+\end{problem}
+
+\paragraph{Solution}
+
+\phantom{pain}
+\begin{enumerate}[label=(\alph*)]
+  \item Note that $\overline{v}-\mu$ is distributed as $\mathcal{N}(0,(1/n)\Id)$. For ease of notation, let $Z$ be distributed as $\mathcal{N}(0,(1/n)\Id)$, so the goal is to show that with probability $0.99$, for all unit $k$-sparse vectors $u$,
+  \[ \langle u, Z\rangle^2 \le \epsilon. \]
+  By Cauchy-Schwarz,
+  \[ \langle u, Z\rangle^2 \le \sum_{i : u_i \ne 0} Z_i^2. \]
+  By the definition of sparsity, $\{i : u_i \ne 0\}$ is some set of size at most $k$. Fix some subset $S \subseteq [d]$ of size $k$. Then,
+  \[ \Pr\left[ \sum_{i \in S} Z_i^2 \ge \epsilon^2 \right] = \Pr_{Y \sim \mathcal{N}(0,\Id_k)}\left[ \|Y\|^2 \ge n\epsilon^2 \right].  \]
+  Standard concentration bounds (e.g. Bernstein's inequality used with the subexponentiality of $\chi^2$ random variables) imply that this quantity is bounded by $\exp\left(-\Omega\left(\frac{\epsilon^2 n}{k}\right)\right) = \exp(-\Omega(k \log d))$.
+  We can now take a union bound over all subsets $S$ of size at most $k$ -- there are $\exp(O(k \log (d)))$ such subsets, completing the proof if we take the constant factor in $n$ sufficiently large.
+
+  \item We have
+  \begin{align*}
+    \Sigma_{ij} &= \frac{1}{n} \sum_{r=1}^n (v_r - \overline{v})_i (v_r - \overline{v})_j \\
+      &= \frac{1}{n} \sum_{r=1}^n (v_r - \mu)_i (v_r - \mu)_j + (\mu - \overline{v})_i(\mu - \overline{v})_j + (v_r - \overline{v})_i(\mu - \overline{v})_j + (\mu - \overline{v})_i(v_r - \overline{v})_j \\
+      &= (\overline{v} - \mu)_i(\overline{v} - \mu)_j + \frac{1}{n} \sum_{r=1}^{n} (v_r - \mu)_i (v_r - \mu)_j
+  \end{align*}
+  Since the distinct coordinates of $(\overline{v}-\mu)$ are distributed as independent copies of $\mathcal{N}(0,1/n)$, with probability at least $0.95$ (say), all their absolute values are less than $1/2k$. Indeed,
+  \[ \Pr_{X \sim \mathcal{N}(0,1/n)}\left[ |X| \ge \frac{1}{2k} \right] \le \exp\left(-\Omega(n/4k^2)\right) = O\left(\frac{1}{d}\right), \]
+  and we can take a union bound over the $d$ coordinates ($X$ above is one of the coordinates of $\overline{v}-\mu$). Given that this event happens, note that the first term of $\Sigma_{ij}$ can be bounded using Cauchy-Schwarz by $\frac{1}{2}\left( (\overline{v} - \mu)_i^2 + (\overline{v} - \mu)_j^2 \right) \le 1/2k$, so it now suffices to bound the second term. That is, shifting the points $v_r$ back by $\mu$ to get $w_r$, we wish to show that given $w_1,\ldots,w_n \sim \mathcal{N}(0,\Id)$,
+  \[ \left\| \frac{1}{n} \sum_{r=1}^{n} w_r w_r^\top - \Id \right\|_\infty \le \frac{1}{2k} \]
+  with high probability. For the diagonal entries, this probability is
+  \[ \Pr\left[ \frac{1}{n} \sum_{r=1}^{n} (w_r)_i^2 - 1 \ge \frac{1}{2k} \right] = \Pr_{X \sim \mathcal{N}(0,\Id_n)}\left[ \|X\|^2 - n \ge \frac{n}{2k} \right].  \]
+  Applying standard concentration bounds again, this is $\exp(-\Omega(n/k^2)) = O(1/d^2)$. For off-diagonal entries $ij$, this probability is
+  \[ \Pr\left[ \frac{1}{n} \sum_{r=1}^{n} (w_r)_i (w_r)_j \ge \frac{1}{2k} \right] = \Pr_{X,X' \sim \mathcal{N}(0,\Id_n)}\left[ \langle X,X'\rangle \ge \frac{n}{2k} \right] = \Pr_{\substack{X \sim \mathcal{N}(0,\Id_n) \\ X' \sim \mathcal{N}(0,1)}} \left[ \|X\| X' \ge \frac{n}{2k} \right], \]
+  where the final inequality is because conditioned on $X$, the projection of $X'$ on the direction of $X$ is distributed as a standard one-dimensional Gaussian. Standard Gaussian tail bounds imply that this is bounded as
+  \begin{align*}
+    \Pr_{\substack{X \sim \mathcal{N}(0,\Id_n) \\ X' \sim \mathcal{N}(0,1)}} \left[ X' \ge \frac{n}{2k\|X\|} \right] &\le \E_{X \sim \mathcal{N}(0,\Id_n)} \left[\exp\left( - \Omega\left(\frac{n^2}{k^2\|X\|^2}\right) \right)\right] \\
+      &\le \Pr_{X \sim \mathcal{N}(0,\Id_n)}[\|X\|^2 \ge 2n] + \exp\left( - \Omega\left( \frac{n^2}{k^2n} \right) \right) \\
+      &\le \Pr_{X \sim \mathcal{N}(0,\Id_n)}[\|X\|^2 \ge 2n] + \exp\left( - \Omega\left( \frac{n}{k^2} \right) \right) = O(1/d^2),
+  \end{align*}
+  where the second inequality is because $\exp(-z)$ is at most $1$ for $z \ge 0$, and the final inequality follows exactly like the earlier concentration bound and the fact that $n = \Omega(k^2 \log d)$.\\
+  Taking a union bound over all $d^2$ entries of the matrix completes the proof.
+
+  \item This part is immediate from (a) and (b). First condition on these events (since both happen with probability $0.99$). For simplicity, suppose that the adversary does not reorder the sample, so if a sample is not corrupted, then $v_i = v_i'$. Then, one can choose $w_i = \indic[v_i = v_i']$, and $z_i = v_i$ for all $i$. The first constraint is trivially satisfied since each $w_i \in \{0,1\}$, the second because at most $\epsilon n$ corruptions are introduced, the third by the definition of $w_i$ and $z_i$, and the last two by (b).
+
+  \item By Cauchy-Schwarz, we have
+  \[ \mathcal{S} \vdash_2 \frac{1}{n} \sum_{i=1}^n \langle u, z_i - v_i\rangle^2 \le 4 \left(\underbrace{\frac{1}{n} \sum_{i=1}^n  \langle u, z_i - \overline{z}\rangle^2}_{\text{(I)}} +  \langle u, \overline{z} - \mu\rangle^2 + \underbrace{\langle u, \mu - \overline{v}\rangle^2}_{\text{(II)}} + \underbrace{\frac{1}{n} \sum_{i=1}^n \langle u, \overline{v} - v_i\rangle^2}_{\text{(III)}}\right). \]
+  First, note that (a) implies that (II) is bounded by $\epsilon^2$. To bound (III), set $\Sigma' = (1/n) \sum_{i=1}^n (v_i - \overline{v})(v_i - \overline{v})^\top$. By (b), $|\Sigma' - \Id|_\infty \le 1/k$. Then, setting $S = \{i : u_i \ne 0\}$ (with $|S| \le k$),
+  \begin{align*}
+    \text{(III)} &= u^\top \Sigma' u \\
+      &= \sum_{i \in S} u_i^2 \Sigma'_{ii} + \sum_{\substack{i,j \in S \\ i \ne j}} u_i u_j \Sigma'_{ij} \\
+      &\le \left(1 + \frac{1}{k}\right) + \sum_{\substack{i,j \in S \\ i \ne j}} \frac{u_i^2 + u_j^2}{2} \cdot \frac{1}{k} \\
+      &\le \left(1 + \frac{1}{k}\right) + \sum_{i \in S} \frac{1}{k} = 2 + \frac{1}{k}.
+  \end{align*}
+  Similarly, by the SoS constraints, setting $\Sigma'' = (1/n) \sum_{i=1}^n (z_i - \overline{z})(z_i - \overline{z})^\top$, we have $\mathcal{S} \vdash_2 \|\Sigma'' - \Id\|_\infty \le 1/k$, so
+  \[ \mathcal{S} \vdash_2 \text{(I)} = u^\top \Sigma'' u \le 2 + \frac{1}{k}. \]
+  Therefore, putting the pieces together, we get that
+  \[ \mathcal{S} \vdash_2 \frac{1}{n} \sum_{i=1}^n  \langle u, z_i - v_i\rangle^2 \le 4\left(4 + \frac{2}{k} + \epsilon^2 +  \langle u, z-\mu\rangle^2\right) = O(1) \cdot (1 +  \langle u,z-\mu\rangle^2), \]
+  as desired.
+  
+  \item Note that $\mathcal{S} \vdash_2 (z_i - v_i) w_i \indic_{v_i = v_i'} = 0$. Consequently
+  \begin{align*}
+    \mathcal{S} \vdash_4 \langle u, \overline{z}-\overline{v}\rangle^2 &= \left( \frac{1}{n} \sum_{i=1}^n \langle u, z_i-v_i\rangle \right)^2 \\
+      &= \left( \frac{1}{n} \sum_{i=1}^n \langle u, (z_i - v_i) (1 - \indic_{v_i = v_i'} w_i)\rangle \right)^2 \\
+      &\le \left(\frac{1}{n} \sum_{i=1}^n \langle u, z_i-v_i\rangle^2 \right) \left( \frac{1}{n} \sum_{i=1}^n (1 - \indic_{v_i = v_i'} w_i)^2 \right),
+  \end{align*}
+  where the final inequality follows by Cauchy-Schwarz. Now,
+  \[ \mathcal{S} \vdash_2 \sum_{i=1}^n (1 - \indic_{v_i = v_i'} w_i)^2 = \sum_{i=1}^n (1 - \indic_{v_i = v_i'} w_i) = \sum_{i=1}^n (1 - w_i) + (1 - \indic_{v_i=v_i'}) \underbrace{w_i}_{\mathcal{S} \vdash_2 w_i \le 1} \le 2\epsilon n,  \]
+  where we used the second constraint in the sum-of-squares system to bound the first sum by $\epsilon n$, and that at most $\epsilon n$ of the $v_i$ were corrupted to bound the second term by $\epsilon n$. Substituting this back in the earlier string of equations, and using (d), we get that
+  \[ \langle u, \overline{z} - \overline{v}\rangle^2 \le O(\epsilon) (1 + \langle u, \overline{z}-\mu\rangle^2) \]
+  as desired.
+
+
+  \item Indeed, we have
+  \begin{align*}
+    \mathcal{S} \vdash_4 \langle u, \overline{z}-\mu\rangle^2 &\le 2 \langle u, \overline{z} - \overline{v}\rangle^2 + 2 \langle u, \overline{v} - \mu\rangle^2 \\
+      &\le O(\epsilon) (1 + \langle u, \overline{z} - \mu\rangle^2) + O(\epsilon^2) \\
+      \langle u, \overline{z} - \mu\rangle^2 &\le O(\epsilon)
+  \end{align*}
+  as desired.
+  Here, the first inequality is Cauchy-Schwarz, and the second by (a) and (e).\\
+
+  The final algorithm is as follows. We find a pseudoexpectation $\pE$ that is feasible for the sum-of-squares relaxation $\mathcal{S}$, and output $\hat{\mu}$, such that $\hat{\mu}_i = (\pE \overline{z})_i$ for the $k$ coordinates with largest $(\pE \overline{z})_i$.
+  Just as in usual robust mean estimation, we have that for any $k$-sparse unit vector $u$,
+  \[ \epsilon \ge \pE \langle u,\overline{z}-\mu\rangle^2 \ge \langle u, \pE \overline{z}-\mu\rangle^2, \]
+  so $\langle u, \pE \overline{z} - \mu\rangle = O(\sqrt{\epsilon})$.
+  Let $S = \{i : \hat{\mu}_i \ne 0\}$ and $T = \{i : \mu_i \ne 0\}$. For simplicity, assume that $|S|=|T|=k$ (in general one can add in arbitrary coordinates where $\hat{\mu}_i$ or $\mu_i$ is $0$). Set $z' = (\pE z)|_{S \setminus T}$, $z'' = (\pE z)|_{S \cap T}$, and $z''' = (\pE z)|_{T \setminus S}$ -- observe that $\hat{\mu} = z' + z''$. Similarly, set $\mu'' = \mu|_{S \cap T}$ and $\mu''' = \mu|_{T \setminus S}$. Choosing $u$ as the unit vectors in the directions of $z'$, $z''-\mu''$, and $z'''-\mu'''$, we get that each of $\|z'\|,\|z''-\mu''\|,\|z'''-\mu'''\|$ is $O(\sqrt{\epsilon})$. Note that since $z$ consists of the $k$ largest coordinates of $\pE z$, and $|S \setminus T| = |T \setminus S|$, $\|z'''\| \le \|z'\| = O(\sqrt{\epsilon})$. Therefore,
+  \[ \|\hat{\mu} - \mu\| = \|z' + z'' - \mu'' - \mu'''\| \le \|z'\| + \|z'' - \mu''\| + \|z''' - \mu'''\| + \|z'''\| \le O(\sqrt{\epsilon}) \]
+  as desired. \qed
+\end{enumerate}
+
+\clearpage
+
+\begin{problem}
+  Recall the \emph{planted clique} problem, with the ``null distribution'' $\mathcal{N} = G(n,1/2)$, and the ``planted distribution'' $\mathcal{P}$ obtained by drawing $G$ from $G(n,1/2)$, and adding a uniformly random $k$-clique. It is believed that for $k$ significantly smaller than $O(\sqrt{n})$ (say $O(n^{1/2 - \eps})$), it is computationally hard to distinguish these two distributions. In this question, we will establish this computational hardness for the restricted class of algorithms based on low-degree polynomials.
+
+  Concretely, set $k = O(n^{1/2 - \eps})$ for some (small) constant $\eps > 0$, and $D \le C \log n$ for some (large) constant $C > 0$. Recall the degree-$D$ $\chi^2$-divergence, defined by
+  \[ \sqrt{ \chi^2_{\le D}\left( \mathcal{P} \| \mathcal{N} \right) } = \max_{\substack{F : \{ \text{set of graphs on $n$ vertices} \} \to \R \\ F \text{ degree $\le D$ polynomial} \\ F \text{ not identically $0$}}} \frac{ \E_{\mathcal{P}}[F] - \E_{\mathcal{N}}[F] }{\sqrt{\Var_{\mathcal{N}}[F]}}. \]
+  Further recall that this maximum is attained by the function $\left( \frac{\mathcal{P}}{\mathcal{N}} \right)^{\le D}$, where $\frac{\mathcal{P}}{\mathcal{N}}$ is the likelihood ratio $\frac{\mathcal{P}}{\mathcal{N}}(G) = \frac{\mathcal{P}(G)}{\mathcal{N}(G)}$ and the notation $f^{\le D}$ denotes the projection of $f$ to the space of degree $D$ polynomials. This resulting maximum is equal to
+  \[ \chi^2_{\le D} \left( \mathcal{P} \| \mathcal{N} \right) = \left\| \left( \frac{\mathcal{P}}{\mathcal{N}} \right)^{\le D} - 1 \right\|_2^2, \]
+  with the notation $\|f\|_2^2 = \E_{\mathcal{N}} f^2$.
+
+  \begin{enumerate}[label=(\alph*)]
+    \item Let $g = \left( \frac{\mathcal{P}}{\mathcal{N}} \right)^{\le D}$ be a polynomial of degree $D$ in the variables $(x_e)_{e \in \binom{[n]}{2}}$, where $x_e = 1$ if $e$ is an edge in the graph, and $-1$ otherwise. Express $g$ in terms of its Fourier coefficients as $g = \sum_{\alpha : |\alpha| \le D} \wh{g}_{\alpha} x^\alpha$. Determine $\wh{g}_\alpha$.
+    \item Show that in the given parameter regime of $k,D$, $\chi^2_{\le D}\left( \mathcal{P} \| \mathcal{N} \right) = \|g - 1\|^2 = o(1)$.
+  \end{enumerate}
+\end{problem}
+
+\paragraph{Solution}
+
+\end{document}
