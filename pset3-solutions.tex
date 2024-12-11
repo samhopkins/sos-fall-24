@@ -164,29 +164,21 @@
     \[ \Pr\left[ \text{\# clauses satisfied by $x^*$} \le 0.98m \right] \le \exp\left( - O \left( \frac{(0.01m)^2}{m} \right) \right) = o(1). \]
     Putting these two together, we get that
     \[ \Pr\left[ \text{\# clauses} = Cn\log n(1+o(1)) \text{ and } \text{fraction of clauses satisfied by $x^*$} \ge 0.98 \right] = o(1), \]
-    completing the proof. Note that the $0.98$ here can be replaced with a constant arbitrarily close to $0.99$. We shall use this in the second part.
+    completing the proof. Note that the $0.98$ here can be replaced with a constant arbitrarily close to $0.99$. We will use this in the second part.
 
-    \item Suppose that the set of constraints is $\{x_i x_j = A_{ij} : ij \in E\}$, where each $A_{ij} \in \{\pm 1\}$ and $E$ is the set of pairs involved in constraints. Let $A$ be the corresponding constraint matrix, whose $ij$th entry is $A_{ij}$ if $ij \in E$, and is $0$ otherwise.This $2$-XOR instance may naturally be represented as an optimization problem, where the goal is to maximize $\frac{1}{m} x^\top A x$ subject to the constraints $x_i^2 = 1$ for all $i$.
+    \item For this entire part, let $\eps > 0$ be a small constant---we shall set it to be sufficiently small in the end so that an objective value of at least $0.97$ is attained.
 
-    Consider the natural degree-$2$ sum-of-squares relaxation of the above optimization problem, and suppose it returns a pseudoexpectation $\pE$ over random variables $x_i$, with $\pE \vDash x_i^2 = 1$ for all $i$, and $\pE \frac{1}{m} x^\top A x \ge (0.98-\eps)$. We know that such a pseudoexpectation exists with high probability by the strengthened version of (a)---note that we have a $0.98-\eps$ instead of a $0.99-\eps$ here because $x^\top A x$ is equal to $(\# \text{satisfied clauses}) - (\# \text{unsatisfied clauses})$.
+    Suppose that the set of constraints is $\{x_i x_j = A_{ij} : ij \in E\}$, where each $A_{ij} \in \{\pm 1\}$ and $E$ is the set of pairs involved in constraints. Let $A$ be the corresponding constraint matrix, whose $ij$th entry is $A_{ij}$ if $ij \in E$, and is $0$ otherwise.This $2$-XOR instance may naturally be represented as an optimization problem, where the goal is to maximize $\frac{1}{m} x^\top A x$ subject to the constraints $x_i^2 = 1$ for all $i$.
 
-    The algorithm will be to take the top eigenvector of $\pE xx^\top$, and round it to a vector on the hypercube by taking the sign of each coordinate of this vector.
+    Consider the natural degree-$4$ sum-of-squares relaxation of the above optimization problem, and suppose it returns a pseudoexpectation $\pE$ over random variables $x_i$, with $\pE \vDash x_i^2 = 1$ for all $i$, and $\pE \frac{1}{m} x^\top A x \ge (0.98-\eps)$. We know that such a pseudoexpectation exists with high probability by the strengthened version of (a)---note that we have a $0.98-\eps$ instead of a $0.99-\eps$ here because $x^\top A x$ is equal to $(\# \text{satisfied clauses}) - (\# \text{unsatisfied clauses})$.
+
+    To start, let us show that the objective value attained by a vector essentially only depends on its correlation with $x^*$. For any $y \in \{\pm 1\}^n$, we have
+    \[ y^\top A y = \frac{0.98 C \log n}{n} \langle x^*,y\rangle^2 + \left\langle yy^\top , A - 0.98 \cdot \frac{C \log n}{n} (x^*)(x^*)^\top \right\rangle. \]
+    Motivated by the fact that $\E[A \mid x^*] = 0.98 \cdot \frac{C \log n}{n} \cdot (x^*)(x^*)^\top$, we claim the following.
+
+    \textbf{Lemma.} With high probability, $\opnorm{ A - 0.98 \cdot \frac{C \log n}{n} (x^*)(x^*)^\top } \le \eps C\log n$ for sufficiently large constant $C$.
     
-    We shall complete the proof in two steps. First, we will show that the top eigenvector $y$ of $\pE xx^\top$ is well-correlated with $x^*$, and has large quadratic form $y^\top A y$. Next, we will show that rounding $y$ to a vector on the hypercube does not lose too much in the objective value.
-
-    Let us begin with the second of these steps: let $y$ be a vector of norm $\sqrt{n}$ such that $\langle y,x^*\rangle \ge (1-\eps) n$. Then,
-    \[ \|y-x^*\|^2 \le 2\eps n, \]
-    so there are at most $2\eps n$ indices $i$ such that $|y_i - x_i^*| \ge 1$. In particular, this implies that there are most $2\eps n$ indices $i$ such that $\sgn(y_i) \ne \sgn(x_i^*)$, and thus $\langle \sgn(y) , x^* \rangle \ge (1-2\eps)n$, completing the proof.
-
-    To conclude, we must show that the top eigenvector of $\pE xx^\top$ is well-correlated with $x^*$. We may write
-    \begin{equation}
-      \label{eq:q3-high-corr}
-      (0.98-\eps) m \le \pE x^\top A x = 0.98 \cdot \frac{C \log n}{n} \pE \langle x , x^* \rangle^2 + \left\langle \pE xx^\top , A - 0.98 \cdot \frac{C\log n}{n} (x^*)(x^*)^\top \right\rangle.
-    \end{equation}
-    Indeed, observe that $\E[A \mid x^*] = 0.98 \cdot \frac{C \log n}{n} \cdot (x^*)(x^*)^\top$.
-    Next, we shall show that with high probability, $\opnorm{ A - 0.98 \cdot \frac{C \log n}{n} \cdot (x^*)(x^*)^\top }$ is small.
-
-    This operator norm bound essentially follows from the matrix Bernstein inequality. Indeed, let $B$ be this matrix, and set $B^{(ij)}$ to be the symmetric random matrix such that
+    \emph{Proof.} The above operator norm bound essentially follows from the matrix Bernstein inequality. Indeed, let $B$ be this matrix, and set $B^{(ij)}$ to be the symmetric random matrix such that
     \[ B^{(ij)}_{ij} = B^{(ij)}_{ji} = \begin{cases} - 0.98 \cdot \frac{C \log n}{n} \cdot x_i^* x_j^*, & \text{w.p. } 1 - \frac{C \log n}{n}, \\ \left( 1 - 0.98 \frac{C \log n}{n} \right) x_i^* x_j^*, & \text{w.p. } 0.99 \cdot \frac{C \log n}{n}, \\ - \left( 1 + 0.98 \frac{C \log n}{n} \right) x_i^* x_j^*, & \text{w.p. } 0.01 \cdot \frac{C \log n}{n} \end{cases} \]
     and all other entries are equal to $0$. Clearly, the operator norm of $B^{(ij)}$ is almost surely bounded by $2$, and
     \begin{align*}
@@ -198,16 +190,42 @@
     \[ \opnorm{ \sum_{i,j} (B^{(ij)})^2 } \le O(C \log n). \]
     The matrix Bernstein inequality implies that
     \[ \E \opnorm{ A - 0.98 \cdot \frac{C \log n}{n} (x^*)(x^*)^\top } \le O\left( \sqrt{C} \log n \right). \]
-    For a sufficiently large constant $C$, this implies that with high probability, $\opnorm{ A - 0.99 \cdot \frac{C \log n}{n} (x^*)(x^*)^\top } \le 0.001 C \log n$, and thus, since $m = C n \log n (1+o(1))$, we can plug this back into \eqref{eq:q3-high-corr} to conclude that
-    \[ \pE \langle x,x^*\rangle^2 \ge (1-\eps) n^2. \]
-    for a constant $\eps$ that can be made arbitrarily small.
-    To complete the proof, we must use the above to show that the top eigenvector of $\pE xx^\top$ is correlated with $x^*$. Indeed, the above implies that
+    This implies that for sufficiently large constant $C$ (of the order $\Omega\left(\frac{1}{\eps^2}\right)$), with high probability, $\opnorm{ A - 0.99 \cdot \frac{C \log n}{n} (x^*)(x^*)^\top } \le \eps C \log n$. Since $m = C n \log n (1+o(1))$, we can plug this back into \eqref{eq:q3-high-corr} to conclude that
+    \begin{equation}
+      \label{q3:eq-main}
+      y^\top A y \ge \frac{0.98 C \log n}{n} \langle x^*,y\rangle^2 - \eps m.
+    \end{equation}
+    Further note that the above inequality is true (with high probability) in a sum-of-squares manner, since all we used was a bound on the operator norm of a matrix. \qed\qedhere
+
+    The algorithm we will use is as follows. We pick a uniformly random row $y$ of $\pE xx^\top$, and then round it to a vector $\sgn(y)$ on the hypercube as $\sgn(y)_i = \sgn(y_i)$.
+
+    To analyze this, we must show that
+    \begin{enumerate}
+      \item a random row $y$ of $\pE xx^\top$ is well-correlated with $x^*$, and
+      \item rounding $y$ to a vector on the hypercube does not lose too much in the objective value.
+    \end{enumerate}
+
+    Let us begin with the second of these steps: let $y$ be a vector of norm $\sqrt{n}$ such that $\langle y,x^*\rangle \ge (1-\eps) n$. Then,
+    \[ \|y-x^*\|^2 \le 2\eps n, \]
+    so there are at most $2\eps n$ indices $i$ such that $|y_i - x_i^*| \ge 1$. In particular, this implies that there are most $2\eps n$ indices $i$ such that $\sgn(y_i) \ne \sgn(x_i^*)$, and thus $\langle \sgn(y) , x^* \rangle \ge (1-2\eps)n$, yielding the desideratum by \eqref{q3:eq-main}. 
+
+    To conclude, we must show that a random row of $\pE xx^\top$ is well-correlated with $x^*$. We may write
+    \begin{equation}
+      \label{eq:q3-high-corr}
+      (0.98-\eps) m \le \pE x^\top A x = 0.98 \cdot \frac{C \log n}{n} \pE \langle x , x^* \rangle^2 + \left\langle \pE xx^\top , A - 0.98 \cdot \frac{C\log n}{n} (x^*)(x^*)^\top \right\rangle.
+    \end{equation}
+    By the operator norm bound from earlier, and the concentration of the number of clauses, we have
+    \[ (0.98 - \eps) m \le 0.98 \cdot \frac{C \log n}{n} \pE \langle x,x^*\rangle^2 + \eps m. \]
+    Because $m = C n \log n (1+o(1))$,
+    \[ \left\langle \pE xx^T , (x^*)(x^*)^\top \right\rangle \ge (1-O(\eps))n^2. \]
+    For a (uniformly) random row $v_i$ of $\pE xx^\top$, we have
     \begin{align*}
-      \opnorm{\pE xx^\top - (x^*)(x^*)^\top} &\le \norm{ \pE xx^\top - (x^*)(x^*)^\top }_F^2 \\
-        &\le \norm{\pE xx^\top}_F^2 + n^2 - \pE \langle x,x^*\rangle^2 \\
-        &\le 2n^2 - \pE \langle x,x^*\rangle^2 \le 2\eps n^2.
+      \E |\langle v_i , x^*\rangle| &= \frac{1}{n} \sum_{i \in [n]} \left| \sum_{j \in [n]} (v_i)_j x^*_j \right| \\
+        &= \frac{1}{n} \sum_{i \in [n]} \left| \sum_{j \in [n]} \pE [x_i x_j] \cdot x^*_i x^*_j \right| \\
+        &\ge \frac{1}{n} \left\langle \pE xx^\top , (x^*)(x^*)^\top \right\rangle \ge (1-O(\eps))n.
     \end{align*}
-    Standard inequalities discussed in class (the Davis-Kahan Theorem, for instance) show that this implies that the top eigenvector of $\pE xx^\top$ is well-correlated with $x^*$, completing the proof.
+    Because we almost surely have $\norm{v_i}^2 = \sum_{j \in [n]} \left(\pE x_ix_j\right)^2 \le \sum_{j \in [n]} \pE x_i^2 x_j^2 \le n$, it follows that with high probability, a uniformly random row of $\pE xx^\top$ is $(1-O(\eps))$-correlated with $x^*$, completing the proof by prior discussion.
+
 
   \end{enumerate}
 
