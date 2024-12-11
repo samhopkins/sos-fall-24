@@ -200,16 +200,16 @@
     The algorithm we will use is as follows. We pick a uniformly random row $y$ of $\pE xx^\top$, and then round it to a vector $\sgn(y)$ on the hypercube as $\sgn(y)_i = \sgn(y_i)$.
 
     To analyze this, we must show that
-    \begin{enumerate}
+    \begin{enumerate}[label=(\roman*)]
       \item a random row $y$ of $\pE xx^\top$ is well-correlated with $x^*$, and
       \item rounding $y$ to a vector on the hypercube does not lose too much in the objective value.
     \end{enumerate}
 
-    Let us begin with the second of these steps: let $y$ be a vector of norm $\sqrt{n}$ such that $\langle y,x^*\rangle \ge (1-\eps) n$. Then,
+    Let us begin with (ii). Let $y$ be a vector of norm $\sqrt{n}$ such that $\langle y,x^*\rangle \ge (1-\eps) n$. Then,
     \[ \|y-x^*\|^2 \le 2\eps n, \]
     so there are at most $2\eps n$ indices $i$ such that $|y_i - x_i^*| \ge 1$. In particular, this implies that there are most $2\eps n$ indices $i$ such that $\sgn(y_i) \ne \sgn(x_i^*)$, and thus $\langle \sgn(y) , x^* \rangle \ge (1-2\eps)n$, yielding the desideratum by \eqref{q3:eq-main}. 
 
-    To conclude, we must show that a random row of $\pE xx^\top$ is well-correlated with $x^*$. We may write
+    To conclude, we must show (i), that a random row of $\pE xx^\top$ is well-correlated with $x^*$. We may write
     \begin{equation}
       \label{eq:q3-high-corr}
       (0.98-\eps) m \le \pE x^\top A x = 0.98 \cdot \frac{C \log n}{n} \pE \langle x , x^* \rangle^2 + \left\langle \pE xx^\top , A - 0.98 \cdot \frac{C\log n}{n} (x^*)(x^*)^\top \right\rangle.
