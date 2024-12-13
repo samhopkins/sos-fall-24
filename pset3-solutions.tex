@@ -123,7 +123,7 @@
   The matrix Bernstein inequality implies that
   \[ \E \opnorm{B} \le O\left( \sqrt{ \opnorm{ \E \sum_{i,j \in [n] \text{ distinct}} (B^{(ij)})^2 } } \cdot \sqrt{\log n} + 2 \log n \right) = O(\sqrt{n \log n}). \]
   Markov's inequality implies that with high probability (say $0.99$), $\opnorm{B} \le O(\sqrt{n \log n})$, so
-  \[ \opnorm{ A - \frac{1}{2} J } = \le \opnorm{B} + \opnorm{ \frac{1}{2} \Id } = O(\sqrt{n \log n}), \]
+  \[ \opnorm{ A - \frac{1}{2} J } \le \opnorm{B} + \opnorm{ \frac{1}{2} \Id } = O(\sqrt{n \log n}), \]
   completing the proof.
 
 \clearpage
